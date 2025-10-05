@@ -1,11 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import Loading from "@/components/Loading";
 
 const Home = lazy(() => import('@/pages/Home'))
 const Layout = lazy(() => import('@/pages/Layout'))
 
+
 const withSuspense = (Component: React.ComponentType) => (
-  <Suspense fallback="加载中">
+  <Suspense fallback={<Loading />}>
     <Component />
   </Suspense>
 )
