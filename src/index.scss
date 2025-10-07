@@ -10,6 +10,7 @@
 html, body {
   margin: 0;
   height: 100%;
+  overflow: hidden;
 }
 
 #root {
@@ -30,13 +31,26 @@ $spacing-sm: 8px;
 $spacing-md: 16px;
 $spacing-lg: 24px;
 
+// 导出为CSS变量，供组件使用
+:root {
+  --primary-color: #{$primary-color};
+  --success-color: #{$success-color};
+  --warning-color: #{$warning-color};
+  --error-color: #{$error-color};
+  --font-size-sm: #{$font-size-sm};
+  --font-size-base: #{$font-size-base};
+  --font-size-lg: #{$font-size-lg};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+}
+
 // 3. 基础样式
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: $font-size-base;
   line-height: 1.5;
   color: #333;
-  background-color: #fff;
 }
 
 // 4. 工具类
@@ -55,6 +69,23 @@ body {
 .p-1 { padding: $spacing-sm; }
 .p-2 { padding: $spacing-md; }
 .p-3 { padding: $spacing-lg; }
+
+// 颜色工具类
+.bg-primary { background-color: $primary-color; }
+.bg-success { background-color: $success-color; }
+.bg-warning { background-color: $warning-color; }
+.bg-error { background-color: $error-color; }
+
+.text-primary { color: $primary-color; }
+.text-success { color: $success-color; }
+.text-warning { color: $warning-color; }
+.text-error { color: $error-color; }
+
+// 浅色背景工具类
+.bg-primary-light { background-color: adjust($primary-color, 45%); }
+.bg-success-light { background-color: adjust($success-color, 55%); }
+.bg-warning-light { background-color: adjust($warning-color, 40%); }
+.bg-error-light { background-color: adjust($error-color, 45%); }
 
 // 5. 响应式
 @media (max-width: 768px) {

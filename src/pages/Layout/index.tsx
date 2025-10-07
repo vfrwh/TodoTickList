@@ -44,8 +44,7 @@ const LayoutComponent: React.FC = () => {
         />
       </Header>
       
-      {/* 添加 Content 区域和 Outlet */}
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 64px)' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 64px)', backgroundColor:"#f5f5f5"}}>
         <Outlet />
       </Content>
     </Layout>

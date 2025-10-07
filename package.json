@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.9.0",
     "antd": "^5.27.4",
     "axios": "^1.12.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-infinite-scroll-component": "^6.1.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.3"
   },
   "devDependencies": {

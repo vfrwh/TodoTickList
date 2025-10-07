@@ -1,4 +1,4 @@
-import type { LayoutItem } from "@/types/type"
+import type { LayoutItem } from "@/types/layoutItemType"
 
 const layoutData :{[key:string]: LayoutItem } = {
   item1: {
