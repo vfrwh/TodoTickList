@@ -3,5 +3,5 @@ export interface DataType {
   name?: string;
   email?: string;
   avatar?: string;
-  
+  id:number
 }
