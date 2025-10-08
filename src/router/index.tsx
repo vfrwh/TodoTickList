@@ -24,7 +24,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true, 
-        element: <Navigate to="/list" replace />,
+        element: <Navigate to="/focus" replace />,
       },
       {
         path: 'list',
@@ -47,7 +47,23 @@ const router = createBrowserRouter([
         element: withSuspense(TimeLine),
       },
       {
-        path: 'settings',
+        path: 'list/settings',
+        element: withSuspense(Settings),
+      },
+      {
+        path: 'quadrants/settings',
+        element: withSuspense(Settings),
+      },
+      {
+        path: 'focus/settings',
+        element: withSuspense(Settings),
+      },
+      {
+        path: 'habit/settings',
+        element: withSuspense(Settings),
+      },
+      {
+        path: 'timeLine/settings',
         element: withSuspense(Settings),
       },
     ]

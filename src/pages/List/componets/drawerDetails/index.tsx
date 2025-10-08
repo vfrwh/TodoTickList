@@ -68,7 +68,7 @@ const DrawerDetails = ({open,isEdit,onClose}:DrawerDetailsProps) => {
             <Option value="other">other</Option>
           </Select>
         </Form.Item>
-        <Form.Item name="date-picker" label="DatePicker" rules={[{ required: true, message:'请填写日期' }]}>
+        <Form.Item name="date-picker" label="日期" rules={[{ required: true, message:'请填写日期' }]}>
          
             <DatePicker />
          

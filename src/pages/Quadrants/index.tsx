@@ -1,68 +1,98 @@
-import { Form,DatePicker,Button,Drawer ,Select,Input} from "antd"
-import { useState } from "react";
+import { Card,Col, Row } from "antd"
+import { useQuadrants } from "@/hooks/useQuadrants"
+import { QUADRANTS_CONFIG } from "@/data/quadrantsData"
+
 function Quadrants() {
-  const [form] = Form.useForm();
-  const [open, setOpen] = useState(false);
-  const { Option } = Select;
-  const showDrawer = () => {
-    setOpen(true);
-  };
-
-  const onClose = () => {
-    setOpen(false);
-  };
-
-  const onFinish = (value:any) => {
-    console.log(value)
+  const { 
+    total, 
+    number1, 
+    number2, 
+    number3, 
+    number4,
+    content1, 
+    content2, 
+    content3, 
+    content4,
+  } = useQuadrants()
+  
+  const quadrantsData = {
+    title1: { number: number1, content: content1 },
+    title2: { number: number2, content: content2 },
+    title3: { number: number3, content: content3 },
+    title4: { number: number4, content: content4 },
   }
 
-  const onPriorityChange = () => {
-   
-  };
-  
+  const quadrants = QUADRANTS_CONFIG.map(config => ({
+    ...config,
+    number: quadrantsData[config.key].number,
+    content: quadrantsData[config.key].content
+  }))
+
   return (
-    <>
-    <Button type="primary" onClick={showDrawer}>
-        Open
-      </Button>
-    <Drawer
-      closable
-        destroyOnHidden
-        title={<p>新增数据</p>}
-        placement="right"
-        open={open}
-        onClose={onClose}
-    >
-      <Form
-      form={form}
-        onFinish={onFinish}
+    <div className="container">
+      <Card 
+        title="四象限矩阵" 
+        extra={
+          <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+            总任务：<span style={{ color: '#1890ff' }}>{total}</span>
+          </div>
+        } 
+        style={{ 
+          width: 1000, 
+          height: '80%', 
+          margin: '0 auto',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+        }}
       >
-        <Form.Item name="taskName" label="任务名字" rules={[{ required: true }]}>
-          <Input placeholder="请输入任务名字"/>
-        </Form.Item>
-        <Form.Item name="priority" label="优先级" rules={[{ required: true }]}>
-          <Select
-            placeholder="请选择优先级"
-            onChange={onPriorityChange}
-            allowClear
-          >
-            <Option value="male">male</Option>
-            <Option value="female">female</Option>
-            <Option value="other">other</Option>
-          </Select>
-        </Form.Item>
-        <Form.Item name="date-picker" label="DatePicker" >
-          <DatePicker />
-        </Form.Item>
-        <Form.Item label={null}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
-    </Drawer>
-      
-    </>
+        <Row justify="space-evenly" gutter={[30, 30]}>
+          {quadrants.map((quadrant, index) => (
+            <Col span={12} key={index}>
+              <Card 
+                title={quadrant.title}
+                extra={
+                  <span style={{ 
+                    color: 'white', 
+                    fontWeight: 'bold',
+                    fontSize: '16px'
+                  }}>
+                    ({quadrant.number})
+                  </span>
+                }
+                style={{
+                  height: 350,
+                  backgroundColor: quadrant.bgColor,
+                  border: 'none',
+                  borderRadius: '8px'
+                }}
+                headStyle={{ 
+                  color: 'white',
+                  borderBottom: '1px solid rgba(255,255,255,0.2)',
+                  fontSize: '16px',
+                  fontWeight: 'bold'
+                }}
+                bodyStyle={{ 
+                  color: 'white',
+                  height: 'calc(100% - 57px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <div style={{ 
+                  width: '100%', 
+                  textAlign: 'center',
+                  fontSize: '14px',
+                  lineHeight: '1.6'
+                }}>
+                  {quadrant.content || '暂无任务'}
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Card>
+    </div>
+
   )
 }
 

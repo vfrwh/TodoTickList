@@ -21,10 +21,6 @@ const layoutData :{[key:string]: LayoutItem } = {
     key:'/timeLine',
     title:'时间线'
   },
-  item6: {
-    key:'/settings',
-    title:'设置'
-  },
 }
 
 export { layoutData }

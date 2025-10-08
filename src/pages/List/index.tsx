@@ -44,7 +44,23 @@ const handleCloseDrawer = () => {
 
   return (
     <div className="container">
-      <Card title="任务清单" extra={<Button type="primary" onClick={onAdd}>添加任务</Button>} style={{width:1000,margin:'0 auto' }} >
+      <Card 
+        title="任务清单" 
+        extra={
+          <Button 
+            type="primary" 
+            onClick={onAdd}
+          >
+            添加任务
+          </Button>
+        } 
+        style={{ 
+          width: 1000, 
+          height: '80%', 
+          margin: '0 auto',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+        }} 
+      >
         <Input placeholder="快速添加任务" style={{marginBottom:20}}/>
         <div
       id="scrollableDiv"
