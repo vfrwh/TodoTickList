@@ -20,7 +20,6 @@ function Settings() {
   };
 
   const handleCancel = () => {
-    console.log('设置已取消');
     handleClose();
   };
 
@@ -31,6 +30,7 @@ function Settings() {
   const handleReset = () => {
     formRef.current?.handleReset()
     message.success('已恢复默认设置')
+    handleClose();
   }
 
   return (
@@ -41,7 +41,7 @@ function Settings() {
       onCancel={handleCancel}
       footer={[
         <Button key="reset" onClick={handleReset}>
-          恢复默认
+          恢复默认并保存
         </Button>,
         <Button key="cancel" onClick={handleCancel}>
           取消
@@ -63,6 +63,11 @@ function Settings() {
           padding: 0,
           margin: 0,
           overflow: 'hidden', 
+        },
+        footer: {
+          gap:'10px',
+          display: 'flex',
+          justifyContent: 'flex-end'
         }
       }}
     >

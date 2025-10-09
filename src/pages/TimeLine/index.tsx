@@ -51,9 +51,9 @@ function TimeLine() {
             </Button>
           } 
           style={{ 
-            width: 1000, 
-            // height: '80%', 
+            width: 1200, 
             margin: '0 auto',
+            marginTop: '-1.55%',
             boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
           }}
         >

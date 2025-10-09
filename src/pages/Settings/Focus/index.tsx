@@ -28,6 +28,7 @@ const FocusSettings = () => {
 
     handleReset: () => {
       form.setFieldsValue(defaultValues)
+      dispatch(setDefaultValues(defaultValues))
     }
   }))
 
