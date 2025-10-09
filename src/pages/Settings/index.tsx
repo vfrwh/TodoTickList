@@ -1,14 +1,20 @@
-import { Modal, message } from "antd";
+import { Modal, message,Button } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import SiderComponent from "@/components/SiderComponent";
+import { Outlet } from "react-router-dom";
+import { useRef } from "react";
+import type { FocusFormRefType } from "@/types/focusFormType";
 
 function Settings() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
+  const formRef = useRef<FocusFormRefType | null>(null)
+
   const currentPath = location.pathname.replace('/settings', '');
   
   const handleOk = () => {
+    formRef.current?.handleSave()
     message.success('设置已保存');
     handleClose();
   };
@@ -22,23 +28,41 @@ function Settings() {
     navigate(currentPath);
   };
 
+  const handleReset = () => {
+    
+  }
+
   return (
     <Modal
       title={`设置`}
       open={true}
       onOk={handleOk}
       onCancel={handleCancel}
+      footer={[
+        <Button key="reset" onClick={handleReset}>
+          恢复默认
+        </Button>,
+        <Button key="cancel" onClick={handleCancel}>
+          取消
+        </Button>,
+        <Button key="submit" type="primary" onClick={handleOk}>
+          保存设置
+        </Button>,
+      ]}
       width="100vw"
       style={{
         top: 0,
         padding: 0,
         maxWidth: '100%',
       }}
-      bodyStyle={{
-        height: '98%',
-        padding: 0,
-        margin: 0,
-        overflow: 'hidden', 
+
+      styles={{
+        body: {
+          height: '98%',
+          padding: 0,
+          margin: 0,
+          overflow: 'hidden', 
+        }
       }}
     >
       <div style={{ 
@@ -52,9 +76,7 @@ function Settings() {
           padding: '24px',
           overflow: 'hidden'
         }}>
-          <h3>当前设置页面路由: {location.pathname}</h3>
-          <p>来源页面: {currentPath}</p>
-          <p>这里是针对 {currentPath} 页面的设置内容...</p>
+          <Outlet context={{ formRef }} />
         </div>
       </div>
     </Modal>

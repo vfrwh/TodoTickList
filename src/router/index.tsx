@@ -10,6 +10,11 @@ const Focus = lazy(() => import('@/pages/Focus'))
 const Habit = lazy(() => import('@/pages/Habit'))
 const TimeLine = lazy(() => import('@/pages/TimeLine'))
 const Settings = lazy(() => import('@/pages/Settings'))
+const ListSettings = lazy(() => import('@/pages/Settings/List'))
+const FocusSettings = lazy(() => import('@/pages/Settings/Focus'))
+const HabitSettings = lazy(() => import('@/pages/Settings/Habit'))
+const TimeLineSettings = lazy(() => import('@/pages/Settings/TimeLine'))
+const QuadrantsSettings = lazy(() => import('@/pages/Settings/Quadrants'))
 
 const withSuspense = (Component: React.ComponentType) => (
   <Suspense fallback={<Loading />}>
@@ -47,24 +52,34 @@ const router = createBrowserRouter([
         element: withSuspense(TimeLine),
       },
       {
-        path: 'list/settings',
+        path: 'settings',
         element: withSuspense(Settings),
-      },
-      {
-        path: 'quadrants/settings',
-        element: withSuspense(Settings),
-      },
-      {
-        path: 'focus/settings',
-        element: withSuspense(Settings),
-      },
-      {
-        path: 'habit/settings',
-        element: withSuspense(Settings),
-      },
-      {
-        path: 'timeLine/settings',
-        element: withSuspense(Settings),
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/settings/list" replace />,
+          },
+          {
+            path:'list',
+            element:withSuspense(ListSettings)
+          },
+          {
+            path:'focus',
+            element:withSuspense(FocusSettings)
+          },
+          {
+            path:'habit',
+            element:withSuspense(HabitSettings)
+          },
+          {
+            path:'timeLine',
+            element:withSuspense(TimeLineSettings)
+          },
+          {
+            path:'quadrants',
+            element:withSuspense(QuadrantsSettings)
+          },
+        ]
       },
     ]
   }

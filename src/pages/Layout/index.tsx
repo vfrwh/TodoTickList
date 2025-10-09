@@ -23,7 +23,7 @@ const LayoutComponent: React.FC = () => {
 
   const onSettings = () => {
     // 直接在当前路由后添加 /settings
-    navigate(`${path}/settings`);
+    navigate(`settings${path}`);
   };
 
   return (

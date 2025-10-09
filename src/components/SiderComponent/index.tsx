@@ -13,8 +13,7 @@ const menuItems = Object.values(layoutData).map((item) => ({
 const SiderComponent = ({ currentPath }: SiderComponentProps) => {
   const navigate = useNavigate()
   const onClick: MenuProps['onClick'] = (e) => {
-    console.log('click ', e);
-    navigate(`${e.key}/settings`);
+    navigate(`/settings${e.key}`);
   };
 
   return (

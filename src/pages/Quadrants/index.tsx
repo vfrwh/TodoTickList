@@ -1,4 +1,4 @@
-import { Card,Col, Row } from "antd"
+import { Card,Col, Row,Empty } from "antd"
 import { useQuadrants } from "@/hooks/useQuadrants"
 import { QUADRANTS_CONFIG } from "@/data/quadrantsData"
 
@@ -64,27 +64,27 @@ function Quadrants() {
                   border: 'none',
                   borderRadius: '8px'
                 }}
-                headStyle={{ 
-                  color: 'white',
-                  borderBottom: '1px solid rgba(255,255,255,0.2)',
-                  fontSize: '16px',
-                  fontWeight: 'bold'
-                }}
-                bodyStyle={{ 
-                  color: 'white',
-                  height: 'calc(100% - 57px)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                styles={{
+                  header: { 
+                    color: 'white',
+                    borderBottom: '1px solid rgba(255,255,255,0.2)',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  },
+                  body: { 
+                    color: 'white',
+                    height: 'calc(100% - 57px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }
                 }}
               >
                 <div style={{ 
                   width: '100%', 
-                  textAlign: 'center',
-                  fontSize: '14px',
-                  lineHeight: '1.6'
+                 
                 }}>
-                  {quadrant.content || '暂无任务'}
+                  {quadrant.content || <Empty />}
                 </div>
               </Card>
             </Col>
