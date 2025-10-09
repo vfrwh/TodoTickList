@@ -28,11 +28,21 @@
   }
   
   .circle2 {
+    position: relative;
     width: 330px;
     height: 330px;
     border-radius: 50%;
     background-color: var(--warning-color);
     border: 2px solid #1890ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .time-display {
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
   }
 
   .button-container {

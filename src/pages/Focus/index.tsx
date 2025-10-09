@@ -1,20 +1,21 @@
-import { Card, Button,Space,Select,Form } from "antd"
-import { useState } from "react"
+import { Card, Button, Space, Select, Form } from "antd"
 import './index.scss'
-import type { RootState } from "@/store"
-import { useSelector } from "react-redux"
-
+import { useFocus } from '@/hooks/useFocus'
 
 function Focus() {
-  const [timer, setTimer] = useState<number>(0)
-  const [count, setCount] = useState<number>(0)
+  const {
+    timer,
+    count,
+    displayTime,
+    isRunning,
+    elapsedSeconds,
+    handleStart,
+    handleReset,
+  } = useFocus()
 
   const handleChange = (value: string) => {
-    console.log(`selected ${value}`);
+    // 处理选择变化
   }
-
-  const focusSettingsValues = useSelector((state:RootState) => state.focus.defaultValues)
-  console.log(focusSettingsValues)
 
   return (
     <div className="container">
@@ -30,19 +31,36 @@ function Focus() {
           width: 1000, 
           height: '80%', 
           margin: '0 auto',
-          marginTop: '4%',
+          marginTop: '2%',
           boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
         }} 
       >
         <h4 className="title">专注时间</h4>
         <div className="circles-container">
           <div className="circle1">
-            <div className="circle2"></div>
+            <div className="circle2">
+              <div className="time-display">{displayTime}</div>
+            </div>
           </div>
         </div>
         <div className="button-container">
-          <Button size="large" type="primary" className="start">开始</Button>
-          <Button size="large" className="reset">重置</Button>
+          <Button 
+            size="large" 
+            type="primary" 
+            className="start"
+            onClick={handleStart}
+            disabled={isRunning}
+          >
+            {isRunning ? '计时中...' : '开始'}
+          </Button>
+          <Button 
+            size="large" 
+            className="reset"
+            onClick={handleReset}
+            disabled={!isRunning && elapsedSeconds === 0}
+          >
+            重置
+          </Button>
         </div>
         <Space wrap>
           <Form>
@@ -63,7 +81,6 @@ function Focus() {
               />
             </Form.Item>
           </Form>
-          
         </Space>
       </Card>
     </div>

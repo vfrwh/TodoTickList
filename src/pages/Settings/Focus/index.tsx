@@ -53,7 +53,7 @@ const FocusSettings = () => {
           <div className="setting-control">
             <Form.Item name="focusTime" noStyle>
               <InputNumber 
-                min={5} 
+                min={1} 
                 max={60}
                 style={{ width: '100px' }}
               />
