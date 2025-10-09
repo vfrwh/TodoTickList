@@ -7,7 +7,8 @@ export interface focusFormType {
 }
 
 export type FocusFormRefType = {
-  handleSave: () => void
+  handleSave2: () => void
+  handleReset: () => void; 
 }
 
 export interface OutletContextType {

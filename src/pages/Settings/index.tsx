@@ -14,7 +14,7 @@ function Settings() {
   const currentPath = location.pathname.replace('/settings', '');
   
   const handleOk = () => {
-    formRef.current?.handleSave()
+    formRef.current?.handleSave2()
     message.success('设置已保存');
     handleClose();
   };
@@ -29,7 +29,8 @@ function Settings() {
   };
 
   const handleReset = () => {
-    
+    formRef.current?.handleReset()
+    message.success('已恢复默认设置')
   }
 
   return (

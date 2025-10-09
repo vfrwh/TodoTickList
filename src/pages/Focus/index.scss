@@ -4,33 +4,47 @@
     margin: 0 auto;
     text-align: center;
     margin-top: 30px;
-    font-size: 20px;
+    font-size: 26px;
   }
 
   .circles-container {
     display: flex;
     gap: 20px;
     justify-content: center;
+    margin-bottom: 30px;
   }
 
   .circle1 {
     position: relative;
-    width: 300px;
-    height: 300px;
+    width: 400px;
+    height: 400px;
     margin-top: 30px;
     border-radius: 50%;
     background-color: var(--success-color);
     border: 2px solid #1890ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+  
   .circle2 {
-    position: absolute;
-    top: -2%;
-    left: 7%;
-    width: 250px;
-    height: 250px;
-    margin-top: 30px;
+    width: 330px;
+    height: 330px;
     border-radius: 50%;
     background-color: var(--warning-color);
     border: 2px solid #1890ff;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    
+    .start, .reset {
+      width: 80px;
+      height: 32px;
+    }
   }
 }

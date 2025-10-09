@@ -41,6 +41,9 @@ importers:
       react-router-dom:
         specifier: ^7.9.3
         version: 7.9.3(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      redux-persist:
+        specifier: ^6.0.0
+        version: 6.0.0(react@19.2.0)(redux@5.0.1)
     devDependencies:
       '@eslint/js':
         specifier: ^9.36.0
@@ -1648,6 +1651,15 @@ packages:
   readdirp@4.1.2:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
     engines: {node: '>= 14.18.0'}
+
+  redux-persist@6.0.0:
+    resolution: {integrity: sha512-71LLMbUq2r02ng2We9S215LtPu3fY0KgaGE0k8WRgl6RkqxtGfl7HUozz1Dftwsb0D/5mZ8dwAaPbtnzfvbEwQ==}
+    peerDependencies:
+      react: '>=16'
+      redux: '>4.0.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   redux-thunk@3.1.0:
     resolution: {integrity: sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw==}
@@ -3479,6 +3491,12 @@ snapshots:
   react@19.2.0: {}
 
   readdirp@4.1.2: {}
+
+  redux-persist@6.0.0(react@19.2.0)(redux@5.0.1):
+    dependencies:
+      redux: 5.0.1
+    optionalDependencies:
+      react: 19.2.0
 
   redux-thunk@3.1.0(redux@5.0.1):
     dependencies:

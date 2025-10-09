@@ -3,20 +3,31 @@ import './index.scss'
 import { useImperativeHandle } from "react"
 import { useOutletContext } from "react-router-dom"
 import type { focusFormType, OutletContextType } from "@/types/focusFormType"
+import { defaultValues } from "@/data/focusSettingsData"
+import { setDefaultValues } from "@/store/modules/focus"
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "@/store"
 
 const FocusSettings = () => {
   const [form] = Form.useForm()
   const { formRef } = useOutletContext<OutletContextType>()
+  const dispatch = useDispatch()
 
-  const handleSave = (values: focusFormType) => {
-    console.log('用户设置:', values)
-    // 这里可以调用 API 保存设置
+  const handleSave1 = (values: focusFormType) => {
+    // 保存设置到仓库
+    dispatch(setDefaultValues(values))
   }
+
+  const focusSettingsValues = useSelector((state:RootState) => state.focus.defaultValues)
 
   // 暴露 handleSave 方法
   useImperativeHandle(formRef, () => ({
-    handleSave: () => {
-      form.submit() // 触发表单提交，会调用 handleSave
+    handleSave2: () => {
+      form.submit() // 触发表单提交，会调用 handleSave1
+    },
+
+    handleReset: () => {
+      form.setFieldsValue(defaultValues)
     }
   }))
 
@@ -29,15 +40,9 @@ const FocusSettings = () => {
       
       <Form
         form={form}
-        onFinish={handleSave}
+        onFinish={handleSave1}
         style={{ maxWidth: '100%' }}
-        initialValues={{
-          focusTime: 25,
-          shortBreak: 5,
-          longBreak: 15,
-          autoStartBreak: true,
-          showProgressRing: true
-        }}
+        initialValues={focusSettingsValues}
       >
         {/* 专注时间 */}
         <div className="setting-row">
