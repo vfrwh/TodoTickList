@@ -25,6 +25,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    // 进度条样式
+    &.with-progress {
+      background: conic-gradient(
+        #1890ff 0% var(--progress, 0%),
+        transparent var(--progress, 0%) 100%
+      );
+      
+      .circle2 {
+        background-color: var(--warning-color);
+      }
+    }
+    
+    &:not(.with-progress) {
+      background-color: var(--success-color);
+    }
   }
   
   .circle2 {
@@ -43,6 +59,7 @@
     font-size: 48px;
     font-weight: bold;
     text-align: center;
+    z-index: 1;
   }
 
   .button-container {

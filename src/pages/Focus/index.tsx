@@ -1,6 +1,8 @@
 import { Card, Button, Space, Select, Form } from "antd"
 import './index.scss'
 import { useFocus } from '@/hooks/useFocus'
+import { useSelector } from 'react-redux'
+import type { RootState } from '@/store'
 
 function Focus() {
   const {
@@ -9,9 +11,14 @@ function Focus() {
     displayTime,
     isRunning,
     elapsedSeconds,
+    progress,
     handleStart,
     handleReset,
   } = useFocus()
+
+  // 获取是否显示进度环的设置
+  const focusSettingsValues = useSelector((state: RootState) => state.focus.defaultValues)
+  const showProgressRing = focusSettingsValues.showProgressRing
 
   const handleChange = (value: string) => {
     // 处理选择变化
@@ -37,7 +44,10 @@ function Focus() {
       >
         <h4 className="title">专注时间</h4>
         <div className="circles-container">
-          <div className="circle1">
+          <div 
+            className={`circle1 ${showProgressRing ? 'with-progress' : ''}`}
+            style={showProgressRing ? { '--progress': `${progress}%` } as React.CSSProperties : {}}
+          >
             <div className="circle2">
               <div className="time-display">{displayTime}</div>
             </div>

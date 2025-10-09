@@ -16,6 +16,7 @@ export const useFocus = () => {
   const [isRunning, setIsRunning] = useState<boolean>(false)      // 计时器是否运行中
   const [timeLeft, setTimeLeft] = useState<number>(25 * 60)       // 剩余时间（秒）
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0) // 已过去的时间（秒）
+  const [progress, setProgress] = useState<number>(0)     // 进度百分比 (0-100)
   const intervalRef = useRef<number | null>(null)         // 定时器引用，用于清理
 
   // 从 Redux store 获取专注设置
@@ -55,12 +56,19 @@ export const useFocus = () => {
     const newTimeLeft = focusSettingsValues.focusTime * 60 // 转换为秒
     setTimeLeft(newTimeLeft)
     setDisplayTime(formatTime(newTimeLeft))
+    setProgress(0) // 重置进度
   }, [focusSettingsValues.focusTime])
 
-  // 更新显示时间 - 当剩余时间变化时更新显示
+  // 更新显示时间和进度 - 当剩余时间变化时更新显示
   useEffect(() => {
     setDisplayTime(formatTime(timeLeft))
-  }, [timeLeft])
+    
+    // 计算进度百分比
+    const totalTime = focusTime * 60
+    const elapsed = totalTime - timeLeft
+    const newProgress = totalTime > 0 ? (elapsed / totalTime) * 100 : 0
+    setProgress(newProgress)
+  }, [timeLeft, focusTime])
 
   /**
    * 重置到初始时间
@@ -70,6 +78,7 @@ export const useFocus = () => {
     const initialTime = focusTime * 60 // 转换为秒
     setTimeLeft(initialTime)
     setElapsedSeconds(0)
+    setProgress(0)
     setDisplayTime(formatTime(initialTime))
   }, [focusTime])
 
@@ -166,6 +175,7 @@ export const useFocus = () => {
     displayTime,     // 显示的时间字符串（MM:SS格式）
     isRunning,       // 是否正在计时中
     elapsedSeconds,  // 当前已过去的时间（秒）
+    progress,        // 进度百分比
     handleStart,     // 开始计时函数
     handleReset,     // 重置计时函数
   }
