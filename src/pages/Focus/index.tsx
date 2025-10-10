@@ -12,6 +12,8 @@ function Focus() {
     isRunning,
     elapsedSeconds,
     progress,
+    currentPhase,
+    phaseTitle,
     handleStart,
     handleReset,
   } = useFocus()
@@ -27,7 +29,7 @@ function Focus() {
   return (
     <div className="container">
       <Card
-        title="专注" 
+        title={currentPhase === 'focus' ? "专注" : "休息"} 
         extra={
           <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
             今日专注：<span style={{ color: '#1890ff' }}>{timer}</span>分钟&nbsp;
@@ -42,7 +44,7 @@ function Focus() {
           boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
         }} 
       >
-        <h4 className="title">专注时间</h4>
+        <h4 className="title">{phaseTitle}</h4>
         <div className="circles-container">
           <div 
             className={`circle1 ${showProgressRing ? 'with-progress' : ''}`}

@@ -8,19 +8,27 @@ import {
 } from '@/utils/tool'
 import { saveFocusData, loadFocusData } from '@/localStorage/index'
 
-export const useFocus = () => {
-  const [timer, setTimer] = useState<number>(0)           // 今日总专注时间（分钟）
-  const [count, setCount] = useState<number>(0)           // 今日完成专注次数
-  const [focusTime, setFocusTime] = useState<number>(25)  // 单次专注时长（分钟）
-  const [displayTime, setDisplayTime] = useState<string>('25:00') // 显示的时间格式（MM:SS）
-  const [isRunning, setIsRunning] = useState<boolean>(false)      // 计时器是否运行中
-  const [timeLeft, setTimeLeft] = useState<number>(25 * 60)       // 剩余时间（秒）
-  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0) // 已过去的时间（秒）
-  const [progress, setProgress] = useState<number>(0)     // 进度百分比 (0-100)
-  const intervalRef = useRef<number | null>(null)         // 定时器引用，用于清理
+// 定义计时阶段类型
+export type TimerPhase = 'focus' | 'shortBreak' | 'longBreak'
 
+export const useFocus = () => {
   // 从 Redux store 获取专注设置
   const focusSettingsValues = useSelector((state: RootState) => state.focus.defaultValues)
+
+  // 使用 Redux store 中的值作为初始状态
+  const [timer, setTimer] = useState<number>(0)           // 今日总专注时间（分钟）
+  const [count, setCount] = useState<number>(0)           // 今日完成专注次数
+  const [focusTime, setFocusTime] = useState<number>(focusSettingsValues.focusTime)  // 单次专注时长（分钟）
+  const [shortBreak, setShortBreak] = useState<number>(focusSettingsValues.shortBreak) // 短休息时间（分钟）
+  const [longBreak, setLongBreak] = useState<number>(focusSettingsValues.longBreak)  // 长休息时间（分钟）
+  const [currentPhase, setCurrentPhase] = useState<TimerPhase>('focus') // 当前阶段
+  const [displayTime, setDisplayTime] = useState<string>(formatTime(focusSettingsValues.focusTime * 60)) // 显示的时间格式（MM:SS）
+  const [isRunning, setIsRunning] = useState<boolean>(false)      // 计时器是否运行中
+  const [timeLeft, setTimeLeft] = useState<number>(focusSettingsValues.focusTime * 60)       // 剩余时间（秒）
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0) // 已过去的时间（秒）
+  const [progress, setProgress] = useState<number>(0)     // 进度百分比 (0-100)
+  const [phaseCount, setPhaseCount] = useState<number>(0) // 阶段计数（用于判断长休息）
+  const intervalRef = useRef<number | null>(null)         // 定时器引用，用于清理
 
   // 从localStorage加载数据 
   useEffect(() => {
@@ -36,6 +44,8 @@ export const useFocus = () => {
         // 日期变化，重置今日数据
         setTimer(0)
         setCount(0)
+        setPhaseCount(0)
+        setCurrentPhase('focus')
         saveFocusData(0, 0)
       }
     }
@@ -53,83 +63,188 @@ export const useFocus = () => {
   // 当focusTime改变时更新显示时间和剩余时间
   useEffect(() => {
     setFocusTime(focusSettingsValues.focusTime)
-    const newTimeLeft = focusSettingsValues.focusTime * 60 // 转换为秒
+    setShortBreak(focusSettingsValues.shortBreak)
+    setLongBreak(focusSettingsValues.longBreak)
+    
+    // 根据当前阶段设置时间
+    const newTimeLeft = getPhaseTime(currentPhase) * 60
     setTimeLeft(newTimeLeft)
     setDisplayTime(formatTime(newTimeLeft))
     setProgress(0) // 重置进度
-  }, [focusSettingsValues.focusTime])
+  }, [focusSettingsValues, currentPhase])
 
-  // 更新显示时间和进度 - 当剩余时间变化时更新显示
-  useEffect(() => {
-    setDisplayTime(formatTime(timeLeft))
+  // 获取当前阶段的时间（分钟）
+  const getPhaseTime = useCallback((phase: TimerPhase): number => {
+    switch (phase) {
+      case 'focus':
+        return focusTime
+      case 'shortBreak':
+        return shortBreak
+      case 'longBreak':
+        return longBreak
+      default:
+        return focusTime
+    }
+  }, [focusTime, shortBreak, longBreak])
+
+  // 获取阶段标题
+  const getPhaseTitle = useCallback((phase: TimerPhase): string => {
+    switch (phase) {
+      case 'focus':
+        return '专注时间'
+      case 'shortBreak':
+        return '短休息时间'
+      case 'longBreak':
+        return '长休息时间'
+      default:
+        return '专注时间'
+    }
+  }, [])
+
+  // 计算下一个阶段
+  const calculateNextPhase = useCallback((currentPhase: TimerPhase, currentCount: number): TimerPhase => {
+    if (currentPhase === 'focus') {
+      // 专注结束后
+      const nextCount = currentCount + 1
+      // 判断是否该长休息（每3个专注周期后长休息）
+      if (nextCount % 3 === 0) {
+        return 'longBreak'
+      } else {
+        return 'shortBreak'
+      }
+    } else {
+      // 休息结束后回到专注
+      return 'focus'
+    }
+  }, [])
+
+  // 切换到下一个阶段
+  const switchToNextPhase = useCallback(() => {
+    const nextPhase = calculateNextPhase(currentPhase, phaseCount)
     
-    // 计算进度百分比
-    const totalTime = focusTime * 60
-    const elapsed = totalTime - timeLeft
-    const newProgress = totalTime > 0 ? (elapsed / totalTime) * 100 : 0
-    setProgress(newProgress)
-  }, [timeLeft, focusTime])
+    if (currentPhase === 'focus') {
+      // 专注结束后增加计数
+      setPhaseCount(prev => prev + 1)
+    }
 
-  /**
-   * 重置到初始时间
-   * 将计时器重置为初始的专注时间
-   */
-  const resetToInitialTime = useCallback(() => {
-    const initialTime = focusTime * 60 // 转换为秒
-    setTimeLeft(initialTime)
-    setElapsedSeconds(0)
+    setCurrentPhase(nextPhase)
+    const newTimeLeft = getPhaseTime(nextPhase) * 60
+    setTimeLeft(newTimeLeft)
+    setDisplayTime(formatTime(newTimeLeft))
     setProgress(0)
-    setDisplayTime(formatTime(initialTime))
-  }, [focusTime])
+    setElapsedSeconds(0)
 
-  /**
-   * 开始计时
-   * 启动倒计时，每秒更新剩余时间
-   * 计时自然结束时自动记录完成次数
-   */
-  const handleStart = useCallback(() => {
-    if (isRunning) return // 防止重复启动
+    // 如果是休息阶段，自动开始计时
+    if (nextPhase === 'shortBreak' || nextPhase === 'longBreak') {
+      startBreakTimer(nextPhase)
+    }
+  }, [currentPhase, phaseCount, getPhaseTime, calculateNextPhase])
 
+  // 启动休息计时器
+  const startBreakTimer = useCallback((phase: TimerPhase) => {
     setIsRunning(true)
-    setElapsedSeconds(0) // 重置已过去时间
+    setElapsedSeconds(0)
 
-    // 设置定时器，每秒执行一次
     intervalRef.current = window.setInterval(() => {
       setTimeLeft(prevTime => {
         if (prevTime <= 1) {
-          // 计时自然结束（倒计时到0）
+          // 休息时间结束
           if (intervalRef.current) {
             clearInterval(intervalRef.current)
             intervalRef.current = null
           }
           setIsRunning(false)
 
-          // 计算本次专注的分钟数（完整的一次专注）
-          const totalElapsedSeconds = focusTime * 60
-          const focusMinutes = calculateFocusMinutes(totalElapsedSeconds)
+          // 休息结束后切换到专注阶段
+          setCurrentPhase('focus')
+          const newTimeLeft = getPhaseTime('focus') * 60
+          setTimeLeft(newTimeLeft)
+          setDisplayTime(formatTime(newTimeLeft))
+          setProgress(0)
+          setElapsedSeconds(0)
+          return 0
+        }
+        return prevTime - 1
+      })
+    }, 1000)
+  }, [getPhaseTime])
 
-          // 更新统计 - 只有自然结束时完成次数才+1
-          const newTimer = timer + focusMinutes
-          const newCount = count + 1
-          setTimer(newTimer)
-          setCount(newCount)
-          saveFocusData(newTimer, newCount)
+  // 启动专注计时器
+  const startFocusTimer = useCallback(() => {
+    if (isRunning) return
 
-          // 计时结束后重置到初始时间，准备下一次专注
-          resetToInitialTime()
+    setIsRunning(true)
+    setElapsedSeconds(0)
+
+    // 设置定时器，每秒执行一次
+    intervalRef.current = window.setInterval(() => {
+      setTimeLeft(prevTime => {
+        if (prevTime <= 1) {
+          // 专注时间结束
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current)
+            intervalRef.current = null
+          }
+          setIsRunning(false)
+
+          // 记录完成次数
+          const focusMinutes = calculateFocusMinutes(focusTime * 60)
+          setTimer(prevTimer => {
+            const newTimer = prevTimer + focusMinutes
+            setCount(prevCount => {
+              const newCount = prevCount + 1
+              saveFocusData(newTimer, newCount)
+              return newCount
+            })
+            return newTimer
+          })
+
+          // 切换到下一个阶段
+          switchToNextPhase()
           return 0
         }
 
-        // 更新已过去秒数（用于手动重置时计算部分专注时间）
+        // 更新已过去秒数
         setElapsedSeconds(prev => prev + 1)
-        return prevTime - 1 // 减少剩余时间
+        return prevTime - 1
       })
     }, 1000)
-  }, [isRunning, focusTime, timer, count, resetToInitialTime])
+  }, [isRunning, focusTime, switchToNextPhase])
+
+  // 更新显示时间和进度
+  useEffect(() => {
+    setDisplayTime(formatTime(timeLeft))
+    
+    // 计算进度百分比
+    const totalTime = getPhaseTime(currentPhase) * 60
+    const elapsed = totalTime - timeLeft
+    const newProgress = totalTime > 0 ? (elapsed / totalTime) * 100 : 0
+    setProgress(newProgress)
+  }, [timeLeft, currentPhase, getPhaseTime])
+
+  /**
+   * 重置到初始时间
+   */
+  const resetToInitialTime = useCallback(() => {
+    const initialTime = getPhaseTime(currentPhase) * 60
+    setTimeLeft(initialTime)
+    setElapsedSeconds(0)
+    setProgress(0)
+    setDisplayTime(formatTime(initialTime))
+  }, [currentPhase, getPhaseTime])
+
+  /**
+   * 开始计时
+   */
+  const handleStart = useCallback(() => {
+    // 只有专注阶段需要手动点击开始
+    if (currentPhase === 'focus') {
+      startFocusTimer()
+    }
+  }, [currentPhase, startFocusTimer])
 
   /**
    * 重置计时
-   * 手动停止当前计时，记录已完成的专注时间但不增加完成次数
    */
   const handleReset = useCallback(() => {
     // 清理定时器
@@ -139,22 +254,20 @@ export const useFocus = () => {
     }
     setIsRunning(false)
 
-    // 如果已经计时了一段时间，只记录专注时间，不增加完成次数
-    if (elapsedSeconds > 0) {
+    if (currentPhase === 'focus' && elapsedSeconds > 0) {
+      // 专注阶段手动重置，记录已完成的专注时间
       const focusMinutes = calculateFocusMinutes(elapsedSeconds)
       if (focusMinutes > 0) {
-        // 只更新专注时间，不更新完成次数（部分专注）
         const newTimer = timer + focusMinutes
         setTimer(newTimer)
-        saveFocusData(newTimer, count) // 保持原来的完成次数
+        saveFocusData(newTimer, count)
       }
     }
 
-    // 重置到初始时间
     resetToInitialTime()
-  }, [elapsedSeconds, timer, count, resetToInitialTime])
+  }, [currentPhase, elapsedSeconds, timer, count, resetToInitialTime])
 
-  // 组件卸载时清除定时器 - 防止内存泄漏
+  // 组件卸载时清除定时器
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
@@ -163,20 +276,21 @@ export const useFocus = () => {
     }
   }, [])
 
-  // 数据变化时保存到localStorage - 当timer或count变化时自动保存
+  // 数据变化时保存
   useEffect(() => {
     saveFocusData(timer, count)
   }, [timer, count])
 
-  // 返回给组件使用的状态和方法
   return {
-    timer,           // 今日总专注时间（分钟）
-    count,           // 今日完成专注次数
-    displayTime,     // 显示的时间字符串（MM:SS格式）
-    isRunning,       // 是否正在计时中
-    elapsedSeconds,  // 当前已过去的时间（秒）
-    progress,        // 进度百分比
-    handleStart,     // 开始计时函数
-    handleReset,     // 重置计时函数
+    timer,
+    count,
+    displayTime,
+    isRunning,
+    elapsedSeconds,
+    progress,
+    currentPhase,
+    phaseTitle: getPhaseTitle(currentPhase),
+    handleStart,
+    handleReset,
   }
 }

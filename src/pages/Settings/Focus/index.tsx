@@ -94,7 +94,7 @@ const FocusSettings = () => {
           <div className="setting-control">
             <Form.Item name="longBreak" noStyle>
               <InputNumber 
-                min={10} 
+                min={1} 
                 max={30}
                 style={{ width: '100px' }}
               />
