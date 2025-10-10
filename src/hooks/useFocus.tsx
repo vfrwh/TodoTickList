@@ -134,11 +134,11 @@ export const useFocus = () => {
     setProgress(0)
     setElapsedSeconds(0)
 
-    // 如果是休息阶段，自动开始计时
-    if (nextPhase === 'shortBreak' || nextPhase === 'longBreak') {
+    // 如果是休息阶段，并且设置了自动开始休息，则自动开始计时
+    if ((nextPhase === 'shortBreak' || nextPhase === 'longBreak') && focusSettingsValues.autoStartBreak) {
       startBreakTimer(nextPhase)
     }
-  }, [currentPhase, phaseCount, getPhaseTime, calculateNextPhase])
+  }, [currentPhase, phaseCount, getPhaseTime, calculateNextPhase, focusSettingsValues.autoStartBreak])
 
   // 启动休息计时器
   const startBreakTimer = useCallback((phase: TimerPhase) => {
@@ -237,11 +237,16 @@ export const useFocus = () => {
    * 开始计时
    */
   const handleStart = useCallback(() => {
-    // 只有专注阶段需要手动点击开始
+    if (isRunning) return
+
     if (currentPhase === 'focus') {
+      // 专注阶段手动点击开始
       startFocusTimer()
+    } else if (currentPhase === 'shortBreak' || currentPhase === 'longBreak') {
+      // 休息阶段手动点击开始（当 autoStartBreak 为 false 时）
+      startBreakTimer(currentPhase)
     }
-  }, [currentPhase, startFocusTimer])
+  }, [isRunning, currentPhase, startFocusTimer, startBreakTimer])
 
   /**
    * 重置计时
