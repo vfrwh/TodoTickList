@@ -4,6 +4,7 @@ import Loading from "@/components/Loading";
 
 const List = lazy(() => import('@/pages/List'))
 const Layout = lazy(() => import('@/pages/Layout'))
+const Login = lazy(() => import('@/pages/Login'))
 // 导入其他页面组件（如果需要不同的组件）
 const Quadrants = lazy(() => import('@/pages/Quadrants'))
 const Focus = lazy(() => import('@/pages/Focus'))
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
         ]
       },
     ]
+  },
+  {
+    path: 'login',
+    element: withSuspense(Login)
   }
 ])
 
