@@ -17,12 +17,24 @@ const HabitSettings = lazy(() => import('@/pages/Settings/Habit'))
 const TimeLineSettings = lazy(() => import('@/pages/Settings/TimeLine'))
 const QuadrantsSettings = lazy(() => import('@/pages/Settings/Quadrants'))
 
-const withSuspense = (Component: React.ComponentType) => (
+// 检查是否有 token
+const checkAuth = () => {
+  const token = localStorage.getItem('token');
+  return !!token;
+};
+
+
+// 不需要权限的页面requireAuth需要明确指定 false
+const withSuspense = (Component: React.ComponentType,requireAuth = true) => {
+  if (requireAuth && !checkAuth()) {
+    return <Navigate to="/login" replace />;
+  } 
+  return (
   <Suspense fallback={<Loading />}>
     <Component />
   </Suspense>
-)
-
+  )
+}
 const router = createBrowserRouter([
   {
     path: '/',
@@ -86,7 +98,8 @@ const router = createBrowserRouter([
   },
   {
     path: 'login',
-    element: withSuspense(Login)
+    // 如果已登录，自动重定向到首页
+    element: checkAuth() ? <Navigate to="/" replace /> : withSuspense(Login, false)
   }
 ])
 
