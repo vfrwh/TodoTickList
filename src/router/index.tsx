@@ -16,6 +16,7 @@ const FocusSettings = lazy(() => import('@/pages/Settings/Focus'))
 const HabitSettings = lazy(() => import('@/pages/Settings/Habit'))
 const TimeLineSettings = lazy(() => import('@/pages/Settings/TimeLine'))
 const QuadrantsSettings = lazy(() => import('@/pages/Settings/Quadrants'))
+const Register = lazy(() => import('@/pages/Register'))
 
 // 检查是否有 token
 const checkAuth = () => {
@@ -100,6 +101,11 @@ const router = createBrowserRouter([
     path: 'login',
     // 如果已登录，自动重定向到首页
     element: checkAuth() ? <Navigate to="/" replace /> : withSuspense(Login, false)
+  },
+  {
+    path: 'register', // 添加注册路由
+    // 如果已登录，自动重定向到首页
+    element: checkAuth() ? <Navigate to="/" replace /> : withSuspense(Register, false)
   }
 ])
 

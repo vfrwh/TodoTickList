@@ -1,21 +1,21 @@
-import { Button, Checkbox, Form, Input, Card, Row, Col } from 'antd';
+import { Button, Form, Input, Card } from 'antd';
 import type { FormProps } from 'antd';
-import type { FieldType } from '../../types/loginFormType';
+import type { FieldType } from '../../types/registerFormType';
 import { useNavigate } from 'react-router-dom';
 
-function LoginComponent() {
+function RegisterComponent() {
   const navigate = useNavigate();
 
   const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Success:', values);
+    console.log('注册成功:', values);
   };
 
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    console.log('注册失败:', errorInfo);
   };
 
-  const toRegister = () => {
-    navigate('/register');
+  const toLogin = () => {
+    navigate('/login');
   }
 
   return (
@@ -45,22 +45,21 @@ function LoginComponent() {
             color: '#1890ff',
             margin: 0 
           }}>
-            用户登录
+            用户注册
           </h2>
           <p style={{ 
             color: '#666', 
             marginTop: '8px',
             fontSize: '14px'
           }}>
-            欢迎回来，请登录您的账户
+            创建新账户，开启全新体验
           </p>
         </div>
 
         <Form
-          name="basic"
+          name="register"
           layout="vertical"
           style={{ width: '100%' }}
-          initialValues={{ remember: true }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
@@ -85,7 +84,7 @@ function LoginComponent() {
             label={<span style={{ fontWeight: 500 }}>密码</span>}
             name="password"
             rules={[{ required: true, message: '请输入密码!' }]}
-            style={{ marginBottom: '24px' }}
+            style={{ marginBottom: '20px' }}
           >
             <Input.Password 
               size="large" 
@@ -97,31 +96,32 @@ function LoginComponent() {
             />
           </Form.Item>
 
-          <Row justify="space-between" align="middle" style={{ marginBottom: '30px' }}>
-            <Col>
-              <Form.Item<FieldType> 
-                name="remember" 
-                valuePropName="checked" 
-                noStyle
-              >
-                <Checkbox style={{ color: '#666' }}>
-                  记住密码
-                </Checkbox>
-              </Form.Item>
-            </Col>
-            <Col>
-              <Button 
-                type="link" 
-                style={{ 
-                  padding: 0, 
-                  color: '#1890ff',
-                  fontWeight: 500
-                }}
-              >
-                忘记密码?
-              </Button>
-            </Col>
-          </Row>
+          <Form.Item<FieldType>
+            label={<span style={{ fontWeight: 500 }}>确认密码</span>}
+            name="confirmPassword"
+            dependencies={['password']}
+            rules={[
+              { required: true, message: '请确认密码!' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('两次输入的密码不一致!'));
+                },
+              }),
+            ]}
+            style={{ marginBottom: '30px' }}
+          >
+            <Input.Password 
+              size="large" 
+              placeholder="请确认密码"
+              style={{ 
+                borderRadius: '8px',
+                padding: '10px 12px'
+              }}
+            />
+          </Form.Item>
 
           <Form.Item style={{ marginBottom: '16px' }}>
             <Button 
@@ -146,7 +146,7 @@ function LoginComponent() {
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(24, 144, 255, 0.3)';
               }}
             >
-              登录
+              立即注册
             </Button>
           </Form.Item>
 
@@ -156,17 +156,17 @@ function LoginComponent() {
             color: '#666',
             fontSize: '14px'
           }}>
-            还没有账户? 
+            已有账户? 
             <Button 
+              onClick={toLogin}
               type="link" 
-              onClick={toRegister}
               style={{ 
                 padding: '0 4px',
                 color: '#1890ff',
                 fontWeight: 500
               }}
             >
-              立即注册
+              立即登录
             </Button>
           </div>
         </Form>
@@ -175,4 +175,4 @@ function LoginComponent() {
   );
 }
 
-export default LoginComponent;
+export default RegisterComponent;
