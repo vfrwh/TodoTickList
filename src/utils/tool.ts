@@ -1,3 +1,5 @@
+import { getToken, isTokenExpired } from './token'
+
 // 格式化时间为MM:SS格式
 export const formatTime = (seconds: number): string => {
   const minutes = Math.floor(seconds / 60)
@@ -21,4 +23,15 @@ export const checkDateChange = (): boolean => {
     return data.date !== today
   }
   return false
+}
+
+// 检查是否有 token 的函数
+export const checkAuth = (): boolean => {
+  const token = getToken()
+  if (!token) {
+    return false
+  }
+  
+  // 这里直接调用isTokenExpired来判断
+  return !isTokenExpired()
 }

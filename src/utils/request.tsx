@@ -1,9 +1,10 @@
 import axios from 'axios'
 import { getToken, removeToken } from './token'
 import router from '@/router'
+import { message } from 'antd'
 
 const request = axios.create({
-  // baseURL: 'http://geek.itheima.net/v1_0',
+  baseURL: 'http://192.168.36.34:8080/api',
   timeout: 5000
 })
 
@@ -28,6 +29,7 @@ request.interceptors.response.use((response)=> {
     // 对响应错误做点什么
     if(error.response && error.response.status === 401) {
       removeToken()
+      message.error('登录已过期，请重新登录！');
       router.navigate("/login").then(
         () => {       
           window.location.reload();     

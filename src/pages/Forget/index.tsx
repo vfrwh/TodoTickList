@@ -1,30 +1,34 @@
-import { Button, Form, Input, Card,message } from 'antd';
+import { Button, Form, Input, Card, Row, Col } from 'antd';
 import type { FormProps } from 'antd';
-import type { FieldType } from '../../types/registerFormType';
+import type { FieldType } from '../../types/resetPasswordFormType';
 import { useNavigate } from 'react-router-dom';
-import { registerAPI } from '@/apis/register/index';
 
-function RegisterComponent() {
-  const navigate = useNavigate();
+function ResetPasswordComponent() {
 
-  const onFinish: FormProps<FieldType>['onFinish'] = async (values:FieldType) => {
-    const res = await registerAPI({
-      username: values.username,
-      password: values.password,
-      confirmPassword: values.confirmPassword
-    })
-    console.log('注册响应:', res.data);
-    if(res.status === 200) {
-      message.success('注册成功！');
-      toLogin();
-    } else {
-      message.error(res.statusText || '注册失败，请重试！');
-    }
+  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
+    console.log('提交:', values);
   };
 
+  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    console.log('提交失败:', errorInfo);
+  };
+
+  const navigater = useNavigate();
   const toLogin = () => {
-    navigate('/login');
+    navigater('/login');
   }
+
+  // 生成图形验证码（简单示例）
+  const generateCaptcha = () => {
+    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let captcha = '';
+    for (let i = 0; i < 4; i++) {
+      captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return captcha;
+  };
+
+  const captchaText = generateCaptcha();
 
   return (
     <div style={{
@@ -53,22 +57,24 @@ function RegisterComponent() {
             color: '#1890ff',
             margin: 0 
           }}>
-            用户注册
+            忘记密码
           </h2>
           <p style={{ 
             color: '#666', 
             marginTop: '8px',
-            fontSize: '14px'
+            fontSize: '14px',
+            lineHeight: '1.5'
           }}>
-            创建新账户，开启全新体验
+            请输入用户名和图形验证码，然后设置新密码
           </p>
         </div>
 
         <Form
-          name="register"
+          name="resetPassword"
           layout="vertical"
           style={{ width: '100%' }}
           onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Form.Item<FieldType>
@@ -79,7 +85,7 @@ function RegisterComponent() {
           >
             <Input 
               size="large" 
-              placeholder="请输入用户名"
+              placeholder="请输入您的用户名"
               style={{ 
                 borderRadius: '8px',
                 padding: '10px 12px'
@@ -88,14 +94,60 @@ function RegisterComponent() {
           </Form.Item>
 
           <Form.Item<FieldType>
-            label={<span style={{ fontWeight: 500 }}>密码</span>}
-            name="password"
-            rules={[{ required: true, message: '请输入密码!' }]}
+            label={<span style={{ fontWeight: 500 }}>图形验证码</span>}
+            name="captcha"
+            rules={[{ required: true, message: '请输入图形验证码!' }]}
+            style={{ marginBottom: '20px' }}
+          >
+            <Row gutter={12}>
+              <Col span={16}>
+                <Input 
+                  size="large" 
+                  placeholder="请输入右侧验证码"
+                  style={{ 
+                    borderRadius: '8px',
+                    padding: '10px 12px'
+                  }}
+                />
+              </Col>
+              <Col span={8}>
+                <div 
+                  style={{
+                    width: '100%',
+                    height: '40px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                    fontWeight: 'bold',
+                    color: '#1890ff',
+                    letterSpacing: '2px',
+                    border: '1px solid #d9d9d9',
+                    cursor: 'pointer',
+                    userSelect: 'none'
+                  }}
+                  onClick={() => {
+                    // 这里可以添加刷新验证码的逻辑
+                    console.log('刷新验证码');
+                  }}
+                >
+                  {captchaText}
+                </div>
+              </Col>
+            </Row>
+          </Form.Item>
+
+          <Form.Item<FieldType>
+            label={<span style={{ fontWeight: 500 }}>新密码</span>}
+            name="newPassword"
+            rules={[{ required: true, message: '请输入新密码!' }]}
             style={{ marginBottom: '20px' }}
           >
             <Input.Password 
               size="large" 
-              placeholder="请输入密码"
+              placeholder="请输入新密码"
               style={{ 
                 borderRadius: '8px',
                 padding: '10px 12px'
@@ -104,14 +156,14 @@ function RegisterComponent() {
           </Form.Item>
 
           <Form.Item<FieldType>
-            label={<span style={{ fontWeight: 500 }}>确认密码</span>}
+            label={<span style={{ fontWeight: 500 }}>确认新密码</span>}
             name="confirmPassword"
-            dependencies={['password']}
+            dependencies={['newPassword']}
             rules={[
-              { required: true, message: '请确认密码!' },
+              { required: true, message: '请确认新密码!' },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue('password') === value) {
+                  if (!value || getFieldValue('newPassword') === value) {
                     return Promise.resolve();
                   }
                   return Promise.reject(new Error('两次输入的密码不一致!'));
@@ -122,7 +174,7 @@ function RegisterComponent() {
           >
             <Input.Password 
               size="large" 
-              placeholder="请确认密码"
+              placeholder="请确认新密码"
               style={{ 
                 borderRadius: '8px',
                 padding: '10px 12px'
@@ -153,7 +205,7 @@ function RegisterComponent() {
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(24, 144, 255, 0.3)';
               }}
             >
-              立即注册
+              重置密码
             </Button>
           </Form.Item>
 
@@ -163,17 +215,17 @@ function RegisterComponent() {
             color: '#666',
             fontSize: '14px'
           }}>
-            已有账户? 
+            记起密码了? 
             <Button 
-              onClick={toLogin}
               type="link" 
               style={{ 
                 padding: '0 4px',
                 color: '#1890ff',
                 fontWeight: 500
               }}
+              onClick={toLogin}
             >
-              立即登录
+              返回登录
             </Button>
           </div>
         </Form>
@@ -182,4 +234,4 @@ function RegisterComponent() {
   );
 }
 
-export default RegisterComponent;
+export default ResetPasswordComponent;

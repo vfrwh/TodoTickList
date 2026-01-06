@@ -1,21 +1,44 @@
-import { Button, Checkbox, Form, Input, Card, Row, Col } from 'antd';
+import { Button, Checkbox, Form, Input, Card, Row, Col,message } from 'antd';
 import type { FormProps } from 'antd';
 import type { FieldType } from '../../types/loginFormType';
 import { useNavigate } from 'react-router-dom';
+import { loginAPI } from '@/apis/login/index';
+import { setToken } from '@/utils/token'
 
 function LoginComponent() {
   const navigate = useNavigate();
+  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+  try {
+    const res = await loginAPI({
+      username: values.username,
+      password: values.password
+    });
+    
+    // 根据状态码判断
+    if(res.status === 1001) {
+      message.error(res.statusText);
+      return;
+    }
 
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Success:', values);
-  };
-
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+    if(res.data && res.data.token) {
+      setToken(res.data.token);
+      message.success('登录成功！');
+      navigate('/');
+    } else {
+      message.error('登录失败，请重试！');
+    }
+  } catch (error) {
+    console.error('登录出错:', error);
+    message.error('登录失败，请检查网络连接！');
+  }
+};
 
   const toRegister = () => {
     navigate('/register');
+  }
+
+  const toForget = () => {
+    navigate('/forget');
   }
 
   return (
@@ -62,7 +85,6 @@ function LoginComponent() {
           style={{ width: '100%' }}
           initialValues={{ remember: true }}
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Form.Item<FieldType>
@@ -99,7 +121,7 @@ function LoginComponent() {
 
           <Row justify="space-between" align="middle" style={{ marginBottom: '30px' }}>
             <Col>
-              <Form.Item<FieldType> 
+              <Form.Item<string> 
                 name="remember" 
                 valuePropName="checked" 
                 noStyle
@@ -117,6 +139,7 @@ function LoginComponent() {
                   color: '#1890ff',
                   fontWeight: 500
                 }}
+                onClick={toForget}
               >
                 忘记密码?
               </Button>

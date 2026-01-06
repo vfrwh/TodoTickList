@@ -1,6 +1,8 @@
 // store/index.ts
 import focusReducer from "./modules/focus";
+import userReducer from "./modules/user";
 import { configureStore } from "@reduxjs/toolkit";
+
 import { 
   persistStore, 
   persistReducer,
@@ -20,12 +22,20 @@ const focusPersistConfig = {
   version: 1
 };
 
+const userPersistConfig = {
+  key: 'user',
+  storage,
+  version: 1
+};
+
 // 先对 focusReducer 进行持久化包装
 const persistedFocusReducer = persistReducer(focusPersistConfig, focusReducer);
+const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
 
 const store = configureStore({
   reducer: {
-    focus: persistedFocusReducer 
+    focus: persistedFocusReducer,
+    user:persistedUserReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

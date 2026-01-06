@@ -22,7 +22,7 @@ function Focus() {
   const focusSettingsValues = useSelector((state: RootState) => state.focus.defaultValues)
   const showProgressRing = focusSettingsValues.showProgressRing
 
-  const handleChange = (value: string) => {
+  const handleChange = () => {
     // 处理选择变化
   }
 

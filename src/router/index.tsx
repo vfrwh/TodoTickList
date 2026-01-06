@@ -1,11 +1,12 @@
-import { createBrowserRouter,Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Loading from "@/components/Loading";
+import AuthRoute from "@/components/AuthRoute";
+import PublicRoute from "@/components/PublicRoute";
 
 const List = lazy(() => import('@/pages/List'))
 const Layout = lazy(() => import('@/pages/Layout'))
 const Login = lazy(() => import('@/pages/Login'))
-// 导入其他页面组件（如果需要不同的组件）
 const Quadrants = lazy(() => import('@/pages/Quadrants'))
 const Focus = lazy(() => import('@/pages/Focus'))
 const Habit = lazy(() => import('@/pages/Habit'))
@@ -17,32 +18,27 @@ const HabitSettings = lazy(() => import('@/pages/Settings/Habit'))
 const TimeLineSettings = lazy(() => import('@/pages/Settings/TimeLine'))
 const QuadrantsSettings = lazy(() => import('@/pages/Settings/Quadrants'))
 const Register = lazy(() => import('@/pages/Register'))
-
-// 检查是否有 token
-const checkAuth = () => {
-  const token = localStorage.getItem('token');
-  return !!token;
-};
+const Forget = lazy(() => import('@/pages/Forget'))
 
 
-// 不需要权限的页面requireAuth需要明确指定 false
-const withSuspense = (Component: React.ComponentType,requireAuth = true) => {
-  if (requireAuth && !checkAuth()) {
-    return <Navigate to="/login" replace />;
-  } 
-  return (
+// 使用 Suspense 包裹组件
+const withSuspense = (Component: React.ComponentType) => (
   <Suspense fallback={<Loading />}>
     <Component />
   </Suspense>
-  )
-}
+);
+
 const router = createBrowserRouter([
   {
     path: '/',
-    element: withSuspense(Layout),
+    element: (
+      <AuthRoute>
+        {withSuspense(Layout)}
+      </AuthRoute>
+    ),
     children: [
       {
-        index: true, 
+        index: true,
         element: <Navigate to="/focus" replace />,
       },
       {
@@ -51,7 +47,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'quadrants',
-        element: withSuspense(Quadrants), 
+        element: withSuspense(Quadrants),
       },
       {
         path: 'focus',
@@ -74,24 +70,24 @@ const router = createBrowserRouter([
             element: <Navigate to="/settings/list" replace />,
           },
           {
-            path:'list',
-            element:withSuspense(ListSettings)
+            path: 'list',
+            element: withSuspense(ListSettings)
           },
           {
-            path:'focus',
-            element:withSuspense(FocusSettings)
+            path: 'focus',
+            element: withSuspense(FocusSettings)
           },
           {
-            path:'habit',
-            element:withSuspense(HabitSettings)
+            path: 'habit',
+            element: withSuspense(HabitSettings)
           },
           {
-            path:'timeLine',
-            element:withSuspense(TimeLineSettings)
+            path: 'timeLine',
+            element: withSuspense(TimeLineSettings)
           },
           {
-            path:'quadrants',
-            element:withSuspense(QuadrantsSettings)
+            path: 'quadrants',
+            element: withSuspense(QuadrantsSettings)
           },
         ]
       },
@@ -99,13 +95,27 @@ const router = createBrowserRouter([
   },
   {
     path: 'login',
-    // 如果已登录，自动重定向到首页
-    element: checkAuth() ? <Navigate to="/" replace /> : withSuspense(Login, false)
+    element: (
+      <PublicRoute>
+        {withSuspense(Login)}
+      </PublicRoute>
+    )
   },
   {
-    path: 'register', // 添加注册路由
-    // 如果已登录，自动重定向到首页
-    element: checkAuth() ? <Navigate to="/" replace /> : withSuspense(Register, false)
+    path: 'register',
+    element: (
+      <PublicRoute>
+        {withSuspense(Register)}
+      </PublicRoute>
+    )
+  },
+  {
+    path: 'forget',
+    element: (
+      <PublicRoute>
+        {withSuspense(Forget)}
+      </PublicRoute>
+    )
   }
 ])
 
