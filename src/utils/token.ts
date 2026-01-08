@@ -87,12 +87,13 @@ const startTokenExpirationCheck = () => {
     const token = getToken();
     if (token && isTokenExpired()) {
       console.log('Token已过期，清理本地存储');
+      removeToken();
       // 触发过期事件，让组件可以响应
       window.dispatchEvent(new CustomEvent('token-expired'));
       // 显示过期提示框
       showExpiredModal();
     }
-  }, 10 * 60 * 1000); // 10分钟检查一次
+  }, 10 * 60 * 1000);
   
   console.log('Token过期检查已启动');
 };
