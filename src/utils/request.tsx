@@ -4,7 +4,7 @@ import router from '@/router'
 import { message } from 'antd'
 
 const request = axios.create({
-  baseURL: 'http://192.168.36.34:8080/api',
+  baseURL: 'http://192.168.86.34:8080/api',
   timeout: 5000
 })
 

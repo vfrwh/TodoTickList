@@ -1,34 +1,53 @@
-import { Button, Form, Input, Card, Row, Col } from 'antd';
+import { Button, Form, Input, Card, Row, Col, message } from 'antd';
 import type { FormProps } from 'antd';
-import type { FieldType } from '../../types/resetPasswordFormType';
+import type { FieldType } from '@/types/forgetPasswordFormType';
 import { useNavigate } from 'react-router-dom';
+import { useCaptcha } from '@/hooks/useCaptcha';
+import { debounce } from 'lodash';
+import { useEffect, useMemo } from 'react';
+import { forgetPasswordAPI } from '@/apis/forget';
 
 function ResetPasswordComponent() {
 
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('提交:', values);
+  const { image, captchaId,fetchCaptcha } = useCaptcha();
+
+  const debouncedFetchCaptcha = useMemo(
+    () => debounce(fetchCaptcha, 500, { leading: true, trailing: false }),
+    [fetchCaptcha]
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedFetchCaptcha.cancel?.();
+    };
+  }, [debouncedFetchCaptcha]);
+
+  const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+    try {
+      const res = await forgetPasswordAPI({
+        username: values.username,
+        captcha: values.captcha,
+        captchaId: captchaId,
+        newPassword: values.newPassword,
+        confirmPassword: values.confirmPassword
+      });
+      if(res.status === 200) {
+        message.success('密码重置成功!');
+        navigater('/login');
+      } else {
+        message.error(res.statusText || '密码重置失败，请重试！');
+      }
+    } catch (error) {
+      message.error('密码重置失败，请重试！');
+      console.error('密码重置出错:', error);
+    }
   };
 
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('提交失败:', errorInfo);
-  };
 
   const navigater = useNavigate();
   const toLogin = () => {
     navigater('/login');
   }
-
-  // 生成图形验证码（简单示例）
-  const generateCaptcha = () => {
-    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    let captcha = '';
-    for (let i = 0; i < 4; i++) {
-      captcha += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return captcha;
-  };
-
-  const captchaText = generateCaptcha();
 
   return (
     <div style={{
@@ -74,7 +93,6 @@ function ResetPasswordComponent() {
           layout="vertical"
           style={{ width: '100%' }}
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Form.Item<FieldType>
@@ -111,30 +129,14 @@ function ResetPasswordComponent() {
                 />
               </Col>
               <Col span={8}>
-                <div 
-                  style={{
-                    width: '100%',
-                    height: '40px',
-                    backgroundColor: '#f5f5f5',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '20px',
-                    fontWeight: 'bold',
-                    color: '#1890ff',
-                    letterSpacing: '2px',
-                    border: '1px solid #d9d9d9',
-                    cursor: 'pointer',
-                    userSelect: 'none'
-                  }}
-                  onClick={() => {
-                    // 这里可以添加刷新验证码的逻辑
-                    console.log('刷新验证码');
-                  }}
-                >
-                  {captchaText}
-                </div>
+                {image && (
+                  <img 
+                    src={image} 
+                    alt="验证码" 
+                    onClick={fetchCaptcha}
+                    style={{ cursor: 'pointer' }}
+                  />
+                )}
               </Col>
             </Row>
           </Form.Item>
