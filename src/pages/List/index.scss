@@ -239,3 +239,135 @@
     }
   }
 }
+
+// 在文件末尾添加以下样式
+
+// 卡片视图样式
+.task-card {
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  transition: all 0.2s;
+  background: white;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .task-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .task-avatar {
+      border-radius: 8px;
+    }
+
+    .task-title-wrapper {
+      flex: 1;
+
+      .task-title {
+        display: block;
+        font-weight: 500;
+        color: #262626;
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  .task-description {
+    color: #8c8c8c;
+    font-size: 13px;
+    margin-bottom: 8px;
+    padding-left: 44px;
+  }
+
+  .task-time {
+    font-size: 12px;
+    color: #bfbfbf;
+    margin-bottom: 12px;
+    padding-left: 44px;
+  }
+
+  .task-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 12px;
+  }
+}
+
+// 紧凑视图样式
+.task-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  background: white;
+
+  &:hover {
+    background: #fafafa;
+  }
+
+  .compact-title {
+    color: #262626;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .ant-btn-link {
+    padding: 4px 8px;
+    height: auto;
+
+    &[danger] {
+      color: #f5222d;
+
+      &:hover {
+        color: #ff4d4f;
+      }
+    }
+  }
+}
+
+// 网格视图布局
+.grid-view {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+
+  &.grid-card {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &.grid-compact {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-item {
+    .task-card {
+      height: 100%;
+    }
+  }
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .grid-view.grid-card {
+    grid-template-columns: 1fr;
+  }
+
+  .task-compact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    > div:last-child {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+}

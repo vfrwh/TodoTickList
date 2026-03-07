@@ -1,10 +1,13 @@
-// store/index.ts
 import focusReducer from "./modules/focus";
 import userReducer from "./modules/user";
+import listReducer from "./modules/list";
+import quadrantsReducer from "./modules/quadrants";
+import habitReducer from "./modules/habit";
+import timelineReducer from "./modules/timeline";
 import { configureStore } from "@reduxjs/toolkit";
 
-import { 
-  persistStore, 
+import {
+  persistStore,
   persistReducer,
   FLUSH,
   REHYDRATE,
@@ -12,30 +15,67 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
-// 持久化配置 - 只针对 focus reducer
+// 持久化配置
 const focusPersistConfig = {
-  key: 'focus',
+  key: "focus",
   storage,
-  version: 1
+  version: 1,
 };
 
 const userPersistConfig = {
-  key: 'user',
+  key: "user",
   storage,
-  version: 1
+  version: 1,
 };
 
-// 先对 focusReducer 进行持久化包装
+const listPersistConfig = {
+  key: "list",
+  storage,
+  version: 1,
+};
+
+const quadrantsPersistConfig = {
+  key: "quadrants",
+  storage,
+  version: 1,
+};
+
+const habitPersistConfig = {
+  key: "habit",
+  storage,
+  version: 1,
+};
+
+const timelinePersistConfig = {
+  key: "timeline",
+  storage,
+  version: 1,
+};
+
 const persistedFocusReducer = persistReducer(focusPersistConfig, focusReducer);
 const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
+const persistedListReducer = persistReducer(listPersistConfig, listReducer);
+const persistedQuadrantsReducer = persistReducer(
+  quadrantsPersistConfig,
+  quadrantsReducer,
+);
+const persistedHabitReducer = persistReducer(habitPersistConfig, habitReducer);
+const persistedTimelineReducer = persistReducer(
+  timelinePersistConfig,
+  timelineReducer,
+); // 新增
 
 const store = configureStore({
   reducer: {
     focus: persistedFocusReducer,
-    user:persistedUserReducer
+    user: persistedUserReducer,
+    list: persistedListReducer,
+    quadrants: persistedQuadrantsReducer,
+    habit: persistedHabitReducer,
+    timeline: persistedTimelineReducer, // 新增
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

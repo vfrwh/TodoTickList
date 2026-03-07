@@ -6,7 +6,6 @@ import {
   List,
   Skeleton,
   Divider,
-  message,
   Popconfirm,
   Tag,
 } from "antd";
@@ -16,96 +15,47 @@ import type { PopconfirmProps } from "antd";
 import DrawerDetails from "./componets/drawerDetails";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import generateMockData from "@/data/generateMockData";
-import { type ListItem } from "@/types/ListItem";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import { useTaskList } from "@/hooks/useTaskList";
+import { useTaskPriority } from "@/hooks/useTaskPriority";
+
+// 创建优先级组件避免在回调中使用 Hook
+const PriorityTag = ({ priority }: { priority?: string }) => {
+  const { color, text } = useTaskPriority(priority as any);
+  return <Tag color={color}>{text}</Tag>;
+};
 
 function ListComponent() {
-  // 使用模拟数据
-  const [data, setData] = useState<ListItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [quickAddValue, setQuickAddValue] = useState("");
+  // 获取设置
+  const listSettings = useSelector(
+    (state: RootState) => state.list.defaultValues,
+  );
 
-  // 初始化加载数据
+  // 本地视图模式状态，用于立即响应切换
+  const [currentViewMode, setCurrentViewMode] = useState(listSettings.viewMode);
+
+  // 当设置中的视图模式变化时更新本地状态
   useEffect(() => {
-    loadInitialData();
-  }, []);
+    setCurrentViewMode(listSettings.viewMode);
+  }, [listSettings.viewMode]);
 
-  const loadInitialData = async () => {
-    setLoading(true);
-    try {
-      // 模拟API请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const mockData = generateMockData(20);
-      setData(mockData);
-      setHasMore(true);
-    } catch (error) {
-      message.error("加载失败");
-      console.error("加载数据失败:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadMoreData = async () => {
-    if (loading) return;
-
-    setLoading(true);
-    try {
-      // 模拟API请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const newData = generateMockData(10).map((item) => ({
-        ...item,
-        id: data.length + item.id,
-      }));
-
-      setData([...data, ...newData]);
-      setPage(page + 1);
-
-      // 模拟没有更多数据的情况
-      if (data.length >= 50) {
-        setHasMore(false);
-      }
-    } catch (error) {
-      message.error("加载更多失败");
-      console.error("加载更多数据失败:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleQuickAdd = () => {
-    if (!quickAddValue.trim()) {
-      message.warning("请输入任务名称");
-      return;
-    }
-
-    const newTask: ListItem = {
-      id: data.length + 1,
-      name: quickAddValue,
-      description: "快速添加的任务",
-      priority: "medium",
-      status: "pending",
-      createTime: new Date().toLocaleDateString(),
-    };
-
-    setData([newTask, ...data]);
-    setQuickAddValue("");
-    message.success("添加成功");
-  };
-
-  const handleDelete = (id: number) => {
-    setData(data.filter((item) => item.id !== id));
-    message.success("删除成功");
-  };
-
-  const handleConfirm =
-    (id: number): PopconfirmProps["onConfirm"] =>
-    () => {
-      handleDelete(id);
-    };
+  // 使用自定义 hooks
+  const {
+    displayData,
+    hasMore,
+    quickAddValue,
+    setQuickAddValue,
+    loadMoreData,
+    handleQuickAdd,
+    handleDelete,
+  } = useTaskList({
+    defaultPriority: listSettings.defaultPriority,
+    showCompleted: listSettings.showCompleted,
+    showDescription: listSettings.showDescription,
+    showCreateTime: listSettings.showCreateTime,
+    sortBy: listSettings.sortBy,
+  });
 
   const [open, setOpen] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -127,31 +77,136 @@ function ListComponent() {
     navigate("/list", { replace: true });
   };
 
-  // 获取优先级标签颜色
-  const getPriorityColor = (priority?: string) => {
-    switch (priority) {
-      case "high":
-        return "error";
-      case "medium":
-        return "warning";
-      case "low":
-        return "success";
-      default:
-        return "default";
-    }
-  };
+  const handleConfirm =
+    (id: number): PopconfirmProps["onConfirm"] =>
+    () => {
+      handleDelete(id);
+    };
 
-  // 获取优先级文本
-  const getPriorityText = (priority?: string) => {
-    switch (priority) {
-      case "high":
-        return "高";
-      case "medium":
-        return "中";
-      case "low":
-        return "低";
-      default:
-        return "普通";
+  // 根据视图模式渲染不同的列表项
+  const renderListItem = (item: any) => {
+    switch (currentViewMode) {
+      case "card":
+        return (
+          <div className="task-card">
+            <div className="task-card-header">
+              <Avatar src={item.avatar} className="task-avatar" />
+              <div className="task-title-wrapper">
+                <span className="task-title">{item.name}</span>
+                {item.priority && <PriorityTag priority={item.priority} />}
+              </div>
+            </div>
+            {listSettings.showDescription && item.description && (
+              <div className="task-description">{item.description}</div>
+            )}
+            {listSettings.showCreateTime && item.createTime && (
+              <div className="task-time">创建时间：{item.createTime}</div>
+            )}
+            <div className="task-actions">
+              <Button
+                color="primary"
+                variant="solid"
+                onClick={() => onEdit(item.id)}
+                size="small"
+              >
+                编辑
+              </Button>
+              <Popconfirm
+                title="删除任务"
+                description="确定要删除这个任务吗？"
+                onConfirm={handleConfirm(item.id)}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button color="danger" variant="solid" size="small">
+                  删除
+                </Button>
+              </Popconfirm>
+            </div>
+          </div>
+        );
+
+      case "compact":
+        return (
+          <div className="task-compact">
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <Avatar src={item.avatar} size="small" />
+              <span className="compact-title">{item.name}</span>
+              {item.priority && <PriorityTag priority={item.priority} />}
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <Button type="link" size="small" onClick={() => onEdit(item.id)}>
+                编辑
+              </Button>
+              <Popconfirm
+                title="删除任务"
+                description="确定要删除这个任务吗？"
+                onConfirm={handleConfirm(item.id)}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button type="link" danger size="small">
+                  删除
+                </Button>
+              </Popconfirm>
+            </div>
+          </div>
+        );
+
+      default: // list 视图
+        return (
+          <List.Item
+            actions={[
+              <Button
+                color="primary"
+                variant="solid"
+                onClick={() => onEdit(item.id)}
+                size="small"
+              >
+                编辑
+              </Button>,
+              <Popconfirm
+                title="删除任务"
+                description="确定要删除这个任务吗？"
+                onConfirm={handleConfirm(item.id)}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button color="danger" variant="solid" size="small">
+                  删除
+                </Button>
+              </Popconfirm>,
+            ]}
+          >
+            <List.Item.Meta
+              avatar={<Avatar src={item.avatar} />}
+              title={
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  <span style={{ color: "#262626", fontWeight: 500 }}>
+                    {item.name}
+                  </span>
+                  {item.priority && <PriorityTag priority={item.priority} />}
+                </div>
+              }
+              description={
+                <div>
+                  {listSettings.showDescription && (
+                    <div style={{ color: "#8c8c8c", marginBottom: 4 }}>
+                      {item.description}
+                    </div>
+                  )}
+                  {listSettings.showCreateTime && item.createTime && (
+                    <div style={{ fontSize: 12, color: "#bfbfbf" }}>
+                      创建时间：{item.createTime}
+                    </div>
+                  )}
+                </div>
+              }
+            />
+          </List.Item>
+        );
     }
   };
 
@@ -199,78 +254,28 @@ function ListComponent() {
           }}
         >
           <InfiniteScroll
-            dataLength={data.length}
+            dataLength={displayData.length}
             next={loadMoreData}
             hasMore={hasMore}
             loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
             endMessage={<Divider plain>没有更多任务了 🤐</Divider>}
             scrollableTarget="scrollableDiv"
           >
-            <List
-              itemLayout="horizontal"
-              dataSource={data}
-              renderItem={(item) => (
-                <List.Item
-                  key={item.id}
-                  actions={[
-                    <Button
-                      color="primary"
-                      variant="solid"
-                      onClick={() => onEdit(item.id)}
-                      size="small"
-                    >
-                      编辑
-                    </Button>,
-                    <Popconfirm
-                      title="删除任务"
-                      description="确定要删除这个任务吗？"
-                      onConfirm={handleConfirm(item.id)}
-                      okText="确认"
-                      cancelText="取消"
-                    >
-                      <Button color="danger" variant="solid" size="small">
-                        删除
-                      </Button>
-                    </Popconfirm>,
-                  ]}
-                >
-                  <List.Item.Meta
-                    avatar={<Avatar src={item.avatar} />}
-                    title={
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <a
-                          href="#"
-                          style={{ color: "#262626", fontWeight: 500 }}
-                        >
-                          {item.name}
-                        </a>
-                        {item.priority && (
-                          <Tag color={getPriorityColor(item.priority)}>
-                            {getPriorityText(item.priority)}
-                          </Tag>
-                        )}
-                      </div>
-                    }
-                    description={
-                      <div>
-                        <div style={{ color: "#8c8c8c", marginBottom: 4 }}>
-                          {item.description}
-                        </div>
-                        <div style={{ fontSize: 12, color: "#bfbfbf" }}>
-                          创建时间：{item.createTime}
-                        </div>
-                      </div>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
+            {currentViewMode === "list" ? (
+              <List
+                itemLayout="horizontal"
+                dataSource={displayData}
+                renderItem={(item) => renderListItem(item)}
+              />
+            ) : (
+              <div className={`grid-view grid-${currentViewMode}`}>
+                {displayData.map((item) => (
+                  <div key={item.id} className="grid-item">
+                    {renderListItem(item)}
+                  </div>
+                ))}
+              </div>
+            )}
           </InfiniteScroll>
         </div>
       </Card>

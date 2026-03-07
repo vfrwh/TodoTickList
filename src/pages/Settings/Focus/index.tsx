@@ -1,5 +1,4 @@
 import { Form, InputNumber, Switch, Divider } from "antd";
-import "./index.scss";
 import { useImperativeHandle } from "react";
 import { useOutletContext } from "react-router-dom";
 import type { focusFormType, OutletContextType } from "@/types/focusFormType";
@@ -7,6 +6,12 @@ import { defaultValues } from "@/data/focusSettingsData";
 import { setDefaultValues } from "@/store/modules/focus";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
+import {
+  ClockCircleOutlined,
+  SyncOutlined,
+  PieChartOutlined,
+} from "@ant-design/icons";
+import "@/styles/settings.scss"; // 引入统一的样式文件
 
 const FocusSettings = () => {
   const [form] = Form.useForm();
@@ -14,7 +19,6 @@ const FocusSettings = () => {
   const dispatch = useDispatch();
 
   const handleSave1 = (values: focusFormType) => {
-    // 保存设置到仓库
     dispatch(setDefaultValues(values));
   };
 
@@ -22,12 +26,10 @@ const FocusSettings = () => {
     (state: RootState) => state.focus.defaultValues,
   );
 
-  // 暴露 handleSave 方法
   useImperativeHandle(formRef, () => ({
     handleSave2: () => {
-      form.submit(); // 触发表单提交，会调用 handleSave1
+      form.submit();
     },
-
     handleReset: () => {
       form.setFieldsValue(defaultValues);
       dispatch(setDefaultValues(defaultValues));
@@ -35,88 +37,105 @@ const FocusSettings = () => {
   }));
 
   return (
-    <div className="focus-settings">
-      <div className="header">
-        <h2 className="title">专注盒子</h2>
-        <p className="subtitle">专注工作法和专注计时设置</p>
+    <div className="settings-container">
+      <div className="settings-header">
+        <h2 className="settings-title">专注盒子设置</h2>
+        <p className="settings-subtitle">专注工作法和专注计时设置</p>
       </div>
 
       <Form
         form={form}
         onFinish={handleSave1}
-        style={{ maxWidth: "100%" }}
+        className="settings-form"
         initialValues={focusSettingsValues}
       >
         {/* 专注时间 */}
-        <div className="setting-row">
-          <div className="setting-info">
-            <h3 className="section-title">专注时间</h3>
-            <p className="section-desc">每个专注时段的长度（分钟）</p>
+        <div className="settings-row">
+          <div className="settings-info">
+            <div className="settings-label">
+              <ClockCircleOutlined className="settings-icon" />
+              专注时间
+            </div>
+            <p className="settings-description">每个专注时段的长度（分钟）</p>
           </div>
-          <div className="setting-control">
+          <div className="settings-control">
             <Form.Item name="focusTime" noStyle>
-              <InputNumber min={1} max={60} style={{ width: "100px" }} />
+              <InputNumber min={1} max={60} />
             </Form.Item>
-            <span className="unit">分钟</span>
+            <span className="settings-unit">分钟</span>
           </div>
         </div>
 
-        <Divider className="divider" />
+        <Divider className="settings-divider" />
 
         {/* 短休息时间 */}
-        <div className="setting-row">
-          <div className="setting-info">
-            <h3 className="section-title">短休息时间</h3>
-            <p className="section-desc">短休息时段的长度（分钟）</p>
+        <div className="settings-row">
+          <div className="settings-info">
+            <div className="settings-label">
+              <ClockCircleOutlined className="settings-icon" />
+              短休息时间
+            </div>
+            <p className="settings-description">短休息时段的长度（分钟）</p>
           </div>
-          <div className="setting-control">
+          <div className="settings-control">
             <Form.Item name="shortBreak" noStyle>
-              <InputNumber min={1} max={15} style={{ width: "100px" }} />
+              <InputNumber min={1} max={15} />
             </Form.Item>
-            <span className="unit">分钟</span>
+            <span className="settings-unit">分钟</span>
           </div>
         </div>
 
-        <Divider className="divider" />
+        <Divider className="settings-divider" />
 
         {/* 长休息时间 */}
-        <div className="setting-row">
-          <div className="setting-info">
-            <h3 className="section-title">长休息时间</h3>
-            <p className="section-desc">长休息时段的长度（分钟）</p>
+        <div className="settings-row">
+          <div className="settings-info">
+            <div className="settings-label">
+              <ClockCircleOutlined className="settings-icon" />
+              长休息时间
+            </div>
+            <p className="settings-description">长休息时段的长度（分钟）</p>
           </div>
-          <div className="setting-control">
+          <div className="settings-control">
             <Form.Item name="longBreak" noStyle>
-              <InputNumber min={1} max={30} style={{ width: "100px" }} />
+              <InputNumber min={1} max={30} />
             </Form.Item>
-            <span className="unit">分钟</span>
+            <span className="settings-unit">分钟</span>
           </div>
         </div>
 
-        <Divider className="divider" />
+        <Divider className="settings-divider" />
 
         {/* 自动开始休息 */}
-        <div className="setting-row">
-          <div className="setting-info">
-            <h3 className="section-title">自动开始休息</h3>
-            <p className="section-desc">专注时间结束后自动开始休息计时</p>
+        <div className="settings-row">
+          <div className="settings-info">
+            <div className="settings-label">
+              <SyncOutlined className="settings-icon" />
+              自动开始休息
+            </div>
+            <p className="settings-description">
+              专注时间结束后自动开始休息计时
+            </p>
           </div>
-          <div className="setting-control">
+          <div className="settings-control">
             <Form.Item name="autoStartBreak" valuePropName="checked" noStyle>
               <Switch />
             </Form.Item>
           </div>
         </div>
 
-        <Divider className="divider" />
+        <Divider className="settings-divider" />
 
         {/* 显示进度环 */}
-        <div className="setting-row">
-          <div className="setting-info">
-            <h3 className="section-title">显示进度环</h3>
-            <p className="section-desc">在计时器中显示进度环</p>
+        <div className="settings-row">
+          <div className="settings-info">
+            <div className="settings-label">
+              <PieChartOutlined className="settings-icon" />
+              显示进度环
+            </div>
+            <p className="settings-description">在计时器中显示进度环</p>
           </div>
-          <div className="setting-control">
+          <div className="settings-control">
             <Form.Item name="showProgressRing" valuePropName="checked" noStyle>
               <Switch />
             </Form.Item>

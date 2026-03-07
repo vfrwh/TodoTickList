@@ -7,10 +7,11 @@ import {
 } from "@ant-design/icons";
 import { useQuadrants } from "@/hooks/useQuadrants";
 import { QUADRANTS_CONFIG } from "@/data/quadrantsData";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import "./index.scss";
 import { generateMockTasks } from "@/data/generateMockTasks";
 import { type TaskItem } from "@/types/taskItem";
+import { useQuadrantsSettings } from "@/hooks/useQuadrantsSettings";
 
 // 获取优先级图标和颜色
 const getPriorityConfig = (priority: string) => {
@@ -40,6 +41,13 @@ function Quadrants() {
     title4: [],
   });
 
+  const { settings, processTasks, getCardHeight } = useQuadrantsSettings();
+
+  // 计算总任务数
+  const totalTasks = useMemo(() => {
+    return Object.values(tasks).flat().length;
+  }, [tasks]);
+
   const {
     total,
     number1,
@@ -55,10 +63,29 @@ function Quadrants() {
   // 初始化模拟数据
   useEffect(() => {
     const mockTasks = generateMockTasks();
-    setTasks(mockTasks);
+    const processedTasks = {
+      title1: processTasks(mockTasks.title1 || []),
+      title2: processTasks(mockTasks.title2 || []),
+      title3: processTasks(mockTasks.title3 || []),
+      title4: processTasks(mockTasks.title4 || []),
+    };
+    setTasks(processedTasks);
   }, []);
 
-  // 使用类型断言修复索引错误
+  // 当排序方式改变时重新处理任务
+  useEffect(() => {
+    if (Object.values(tasks).some((arr) => arr.length > 0)) {
+      const mockTasks = generateMockTasks();
+      const processedTasks = {
+        title1: processTasks(mockTasks.title1 || []),
+        title2: processTasks(mockTasks.title2 || []),
+        title3: processTasks(mockTasks.title3 || []),
+        title4: processTasks(mockTasks.title4 || []),
+      };
+      setTasks(processedTasks);
+    }
+  }, [settings.defaultSortBy]);
+
   const quadrantsData = {
     title1: { number: number1, content: content1, tasks: tasks.title1 },
     title2: { number: number2, content: content2, tasks: tasks.title2 },
@@ -66,20 +93,21 @@ function Quadrants() {
     title4: { number: number4, content: content4, tasks: tasks.title4 },
   };
 
-  // 修复：使用类型断言告诉 TypeScript config.key 是 quadrantsData 的键
   const quadrants = QUADRANTS_CONFIG.map((config) => ({
     ...config,
-    number: quadrantsData[config.key as keyof typeof quadrantsData].number,
-    content: quadrantsData[config.key as keyof typeof quadrantsData].content,
-    tasks: quadrantsData[config.key as keyof typeof quadrantsData].tasks,
+    number:
+      quadrantsData[config.key as keyof typeof quadrantsData]?.number || 0,
+    content:
+      quadrantsData[config.key as keyof typeof quadrantsData]?.content || "",
+    tasks: quadrantsData[config.key as keyof typeof quadrantsData]?.tasks || [],
   }));
 
   // 渲染任务列表
   const renderTaskList = (tasks: TaskItem[]) => {
     if (!tasks || tasks.length === 0) {
-      return (
+      return settings.showEmptyHint ? (
         <Empty description="暂无任务" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-      );
+      ) : null;
     }
 
     return (
@@ -113,7 +141,7 @@ function Quadrants() {
                       {task.title}
                     </span>
                   </Space>
-                  {task.deadline && (
+                  {settings.showDeadline && task.deadline && (
                     <Tag
                       color="rgba(255,255,255,0.2)"
                       style={{ color: "#fff" }}
@@ -122,7 +150,7 @@ function Quadrants() {
                     </Tag>
                   )}
                 </div>
-                {task.tags && task.tags.length > 0 && (
+                {settings.showTaskTags && task.tags && task.tags.length > 0 && (
                   <Space size={4} style={{ marginLeft: 22 }}>
                     {task.tags.map((tag) => (
                       <Tag
@@ -159,62 +187,74 @@ function Quadrants() {
         }
         extra={
           <div style={{ fontSize: "16px", fontWeight: 500 }}>
-            总任务：<span style={{ color: "#1890ff" }}>{total || 16}</span>
+            总任务：
+            <span style={{ color: "#1890ff" }}>
+              {total || totalTasks || 16}
+            </span>
           </div>
         }
         className="quadrants-card"
       >
         <Row gutter={[24, 24]}>
-          {quadrants.map((quadrant, index) => (
-            <Col xs={24} sm={24} md={12} key={index}>
-              <Card
-                title={
-                  <Space>
-                    <span style={{ fontSize: 18 }}>{quadrant.icon}</span>
-                    <span>{quadrant.title}</span>
-                  </Space>
-                }
-                extra={
-                  <span
-                    style={{
-                      color: "rgba(255,255,255,0.9)",
-                      fontWeight: 500,
+          {quadrants.map((quadrant, index) => {
+            return (
+              <Col xs={24} sm={24} md={12} key={index}>
+                <Card
+                  title={
+                    <Space>
+                      <span style={{ fontSize: 18 }}>{quadrant.icon}</span>
+                      <span>{quadrant.title}</span>
+                    </Space>
+                  }
+                  extra={
+                    settings.showTaskCount ? (
+                      <span
+                        style={{
+                          color: "rgba(255,255,255,0.9)",
+                          fontWeight: 500,
+                          fontSize: "14px",
+                          background: "rgba(0,0,0,0.2)",
+                          padding: "2px 8px",
+                          borderRadius: "12px",
+                        }}
+                      >
+                        {quadrant.tasks?.length || 0} 项
+                      </span>
+                    ) : null
+                  }
+                  className={`quadrant-card ${quadrant.className} ${
+                    !settings.enableHoverEffect ? "no-hover" : ""
+                  }`}
+                  style={{
+                    backgroundColor: quadrant.bgColor,
+                    border: "none",
+                  }}
+                  styles={{
+                    header: {
+                      color: "white",
+                      borderBottom: "1px solid rgba(255,255,255,0.2)",
                       fontSize: "16px",
-                    }}
-                  >
-                    {quadrant.tasks?.length || 0} 项
-                  </span>
-                }
-                className={`quadrant-card ${quadrant.className}`}
-                style={{
-                  backgroundColor: quadrant.bgColor,
-                  border: "none",
-                }}
-                styles={{
-                  header: {
-                    color: "white",
-                    borderBottom: "1px solid rgba(255,255,255,0.2)",
-                    fontSize: "16px",
-                    fontWeight: 500,
-                    padding: "16px 20px",
-                  },
-                  body: {
-                    color: "white",
-                    height: 280,
-                    overflow: "auto",
-                    padding: "12px 20px",
-                    scrollbarWidth: "thin",
-                    scrollbarColor:
-                      "rgba(255,255,255,0.3) rgba(255,255,255,0.1)",
-                  },
-                }}
-              >
-                <div style={{ height: "100%" }}>
-                  {renderTaskList(quadrant.tasks)}
-                </div>
-              </Card>
-            </Col>
-          ))}
+                      fontWeight: 500,
+                      padding: "16px 20px",
+                    },
+                    body: {
+                      color: "white",
+                      height: getCardHeight(),
+                      overflow: "auto",
+                      padding: "12px 20px",
+                      scrollbarWidth: "thin",
+                      scrollbarColor:
+                        "rgba(255,255,255,0.3) rgba(255,255,255,0.1)",
+                    },
+                  }}
+                >
+                  <div style={{ height: "100%" }}>
+                    {renderTaskList(quadrant.tasks)}
+                  </div>
+                </Card>
+              </Col>
+            );
+          })}
         </Row>
       </Card>
     </div>

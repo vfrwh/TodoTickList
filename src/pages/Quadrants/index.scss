@@ -2,6 +2,7 @@
   height: 100%;
   background: #f5f5f5;
   padding: 24px;
+  overflow-y: auto;
 
   .quadrants-card {
     width: 1000px;
@@ -33,6 +34,13 @@
     overflow: hidden;
     transition: all 0.3s;
     height: 100%;
+
+    &.no-hover {
+      &:hover {
+        transform: none;
+        box-shadow: none !important;
+      }
+    }
 
     &:hover {
       transform: translateY(-4px);

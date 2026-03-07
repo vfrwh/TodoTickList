@@ -17,13 +17,20 @@ import "./index.scss";
 
 const { Option } = Select;
 
+interface HabitDetailsExtendedProps extends HabitDetailsProps {
+  defaultCategory?: string;
+  defaultTargetCount?: number;
+}
+
 const HabitDetails = ({
   open,
   isEdit,
   onClose,
   habitData,
   onSave,
-}: HabitDetailsProps) => {
+  defaultCategory = "健康",
+  defaultTargetCount = 30,
+}: HabitDetailsExtendedProps) => {
   const [form] = Form.useForm();
   const [searchParams] = useSearchParams();
 
@@ -40,9 +47,15 @@ const HabitDetails = ({
         category: habitData.category,
       });
     } else {
-      form.resetFields();
+      // 新增时使用默认值
+      form.setFieldsValue({
+        taskName: "",
+        sign: "",
+        count: defaultTargetCount,
+        category: defaultCategory,
+      });
     }
-  }, [isEdit, habitData, form]);
+  }, [isEdit, habitData, form, defaultCategory, defaultTargetCount]);
 
   const onFinish = async (value: HabitFormTypes) => {
     try {
@@ -63,12 +76,21 @@ const HabitDetails = ({
   };
 
   const onReset = () => {
-    form.resetFields();
-  };
-
-  // 获取分类颜色
-  const getCategoryColor = (category: string) => {
-    return categoryColors[category as keyof typeof categoryColors] || "#1890ff";
+    if (isEdit && habitData) {
+      form.setFieldsValue({
+        taskName: habitData.title,
+        sign: habitData.sign,
+        count: habitData.total,
+        category: habitData.category,
+      });
+    } else {
+      form.setFieldsValue({
+        taskName: "",
+        sign: "",
+        count: defaultTargetCount,
+        category: defaultCategory,
+      });
+    }
   };
 
   return (
@@ -117,7 +139,6 @@ const HabitDetails = ({
         onFinish={onFinish}
         requiredMark="optional"
         className="habit-form"
-        initialValues={{ count: 30 }}
       >
         <Form.Item
           name="taskName"
