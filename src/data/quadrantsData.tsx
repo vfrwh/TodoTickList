@@ -1,24 +1,35 @@
-// src/data/quadrantsConfig.ts
-// 只定义静态配置，不包含动态数据
+// src/data/quadrantsData.ts
 export const QUADRANTS_CONFIG = [
-  { 
-    title: "紧急且重要", 
-    bgColor: 'var(--error-color)',
-    key: 'title1' as const
+  {
+    key: "title1",
+    title: "紧急且重要",
+    icon: "⚡",
+    className: "quadrant-urgent-important",
+    bgColor: "#f5222d",
+    description: "立即执行",
   },
-  { 
-    title: "紧急不重要", 
-    bgColor: 'var(--warning-color)',
-    key: 'title2' as const
+  {
+    key: "title2",
+    title: "重要不紧急",
+    icon: "🎯",
+    className: "quadrant-not-urgent-important",
+    bgColor: "#fa8c16",
+    description: "规划执行",
   },
-  { 
-    title: "不紧急但重要", 
-    bgColor: 'var(--success-color)',
-    key: 'title3' as const
+  {
+    key: "title3",
+    title: "紧急不重要",
+    icon: "⏰",
+    className: "quadrant-urgent-not-important",
+    bgColor: "#1890ff",
+    description: "委托他人",
   },
-  { 
-    title: "不紧急不重要", 
-    bgColor: 'var(--primary-color)',
-    key: 'title4' as const
+  {
+    key: "title4",
+    title: "不紧急不重要",
+    icon: "🗑️",
+    className: "quadrant-not-urgent-not-important",
+    bgColor: "#52c41a",
+    description: "尽量不做",
   },
-]
+];

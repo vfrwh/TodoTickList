@@ -1,8 +1,7 @@
-// LayoutComponent.tsx
-import React from 'react';
-import { Layout, Menu, Button } from 'antd';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { layoutData } from '@/data/layoutData';
+import React from "react";
+import { Layout, Menu, Button } from "antd";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { layoutData } from "@/data/layoutData";
 
 const { Header, Content } = Layout;
 
@@ -22,44 +21,42 @@ const LayoutComponent: React.FC = () => {
   };
 
   const onSettings = () => {
-    // 直接在当前路由后添加 /settings
     navigate(`settings${path}`);
   };
 
   return (
-    <Layout>
+    <Layout style={{ height: "100vh" }}>
       <Header
         style={{
-          position: 'sticky',
+          position: "sticky",
           top: 0,
           zIndex: 1,
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
         }}
       >
         <div className="demo-logo" />
         <Menu
           theme="dark"
           mode="horizontal"
-          defaultSelectedKeys={['1']}
+          defaultSelectedKeys={["1"]}
           selectedKeys={[path]}
           items={menuItems}
           onClick={onMenuClick}
           style={{ flex: 1, minWidth: 0 }}
         />
-        <Button 
-          type="primary"
-          onClick={onSettings}
-        >
+        <Button type="primary" onClick={onSettings}>
           设置
         </Button>
       </Header>
-      <Content style={{ 
-        padding: '24px', 
-        minHeight: 'calc(100vh - 64px)', 
-        backgroundColor: "#f5f5f5"
-      }}>
+      <Content
+        style={{
+          padding: "24px",
+          overflow: "auto", // 改为 auto，让内容区域滚动
+          backgroundColor: "#f5f5f5",
+        }}
+      >
         <Outlet />
       </Content>
     </Layout>

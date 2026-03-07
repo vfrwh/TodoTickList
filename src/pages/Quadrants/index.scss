@@ -1,0 +1,112 @@
+.quadrants-container {
+  height: 100%;
+  background: #f5f5f5;
+  padding: 24px;
+
+  .quadrants-card {
+    width: 1000px;
+    margin: 0 auto;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid #f0f0f0 !important;
+
+    .ant-card-head {
+      border-bottom: 1px solid #f0f0f0 !important;
+      padding: 0 24px !important;
+      background: linear-gradient(to bottom, #ffffff, #fafafa);
+      min-height: 60px;
+
+      .ant-card-head-title {
+        font-size: 18px;
+        font-weight: 500;
+        color: #262626;
+      }
+    }
+
+    .ant-card-body {
+      padding: 24px !important;
+    }
+  }
+
+  .quadrant-card {
+    border-radius: 10px !important;
+    overflow: hidden;
+    transition: all 0.3s;
+    height: 100%;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .ant-card-body {
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.5);
+        }
+      }
+    }
+
+    .task-item {
+      transition: all 0.2s;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(2px);
+      }
+
+      &:last-child {
+        border-bottom: none !important;
+      }
+    }
+  }
+}
+
+// 四象限特定背景色
+.quadrant-urgent-important {
+  background: linear-gradient(135deg, #f5222d, #cf1322) !important;
+}
+
+.quadrant-not-urgent-important {
+  background: linear-gradient(135deg, #fa8c16, #d46b00) !important;
+}
+
+.quadrant-urgent-not-important {
+  background: linear-gradient(135deg, #1890ff, #096dd9) !important;
+}
+
+.quadrant-not-urgent-not-important {
+  background: linear-gradient(135deg, #52c41a, #389e0d) !important;
+}
+
+// 响应式
+@media (max-width: 1024px) {
+  .quadrants-container .quadrants-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .quadrants-container {
+    padding: 12px;
+
+    .quadrant-card {
+      .ant-card-body {
+        height: 240px !important;
+      }
+    }
+  }
+}

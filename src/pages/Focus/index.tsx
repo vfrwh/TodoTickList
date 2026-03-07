@@ -1,8 +1,9 @@
-import { Card, Button, Space, Select, Form } from "antd"
-import './index.scss'
-import { useFocus } from '@/hooks/useFocus'
-import { useSelector } from 'react-redux'
-import type { RootState } from '@/store'
+import { Card, Button, Select } from "antd";
+import "./index.scss";
+import { useFocus } from "@/hooks/useFocus";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import { PlayCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 
 function Focus() {
   const {
@@ -16,87 +17,148 @@ function Focus() {
     phaseTitle,
     handleStart,
     handleReset,
-  } = useFocus()
+  } = useFocus();
 
-  // 获取是否显示进度环的设置
-  const focusSettingsValues = useSelector((state: RootState) => state.focus.defaultValues)
-  const showProgressRing = focusSettingsValues.showProgressRing
+  const focusSettingsValues = useSelector(
+    (state: RootState) => state.focus.defaultValues,
+  );
+  const showProgressRing = focusSettingsValues.showProgressRing;
 
-  const handleChange = () => {
-    // 处理选择变化
-  }
+  const handleChange = (value: string) => {
+    console.log("Selected task:", value);
+  };
+
+  // 根据阶段轻微调整颜色
+  const phaseStyle = {
+    focus: {
+      primary: "#1890ff",
+      bgLight: "#e6f7ff",
+    },
+    rest: {
+      primary: "#52c41a",
+      bgLight: "#f6ffed",
+    },
+  };
+
+  const currentStyle = phaseStyle[currentPhase === "focus" ? "focus" : "rest"];
 
   return (
     <div className="container">
       <Card
-        title={currentPhase === 'focus' ? "专注" : "休息"} 
+        title={
+          <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "4px",
+                background: currentStyle.primary,
+                display: "inline-block",
+              }}
+            />
+            {currentPhase === "focus" ? "专注模式" : "休息模式"}
+          </span>
+        }
         extra={
-          <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-            今日专注：<span style={{ color: '#1890ff' }}>{timer}</span>分钟&nbsp;
-            完成次数: <span style={{ color: '#1890ff' }}>{count}</span>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <span>
+              今日专注 {/* 使用类名 highlight-number */}
+              <span
+                className="highlight-number"
+                style={{ color: currentStyle.primary }}
+              >
+                {timer}
+              </span>{" "}
+              分钟
+            </span>
+            <span>
+              完成 {/* 使用类名 highlight-number */}
+              <span
+                className="highlight-number"
+                style={{ color: currentStyle.primary }}
+              >
+                {count}
+              </span>{" "}
+              次
+            </span>
           </div>
-        } 
-        style={{ 
-          width: 1000, 
-          height: '80%', 
-          margin: '0 auto',
-          marginTop: '2%',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-        }} 
+        }
+        style={{
+          width: 900,
+          margin: "0 auto",
+          marginTop: "2%",
+        }}
       >
-        <h4 className="title">{phaseTitle}</h4>
+        <h4 className="title" style={{ color: currentStyle.primary }}>
+          {phaseTitle}
+        </h4>
+
         <div className="circles-container">
-          <div 
-            className={`circle1 ${showProgressRing ? 'with-progress' : ''}`}
-            style={showProgressRing ? { '--progress': `${progress}%` } as React.CSSProperties : {}}
+          <div
+            className={`circle1 ${showProgressRing ? "with-progress" : ""}`}
+            style={
+              showProgressRing
+                ? ({
+                    "--progress": `${progress}%`,
+                    borderColor: currentStyle.primary,
+                  } as React.CSSProperties)
+                : {}
+            }
           >
             <div className="circle2">
               <div className="time-display">{displayTime}</div>
             </div>
           </div>
         </div>
+
+        {showProgressRing && (
+          <div className="progress-tip">
+            当前进度 <span>{Math.round(progress)}%</span>
+          </div>
+        )}
+
         <div className="button-container">
-          <Button 
-            size="large" 
-            type="primary" 
+          <Button
             className="start"
             onClick={handleStart}
             disabled={isRunning}
+            icon={<PlayCircleOutlined />}
+            style={{
+              backgroundColor: isRunning ? undefined : currentStyle.primary,
+            }}
           >
-            {isRunning ? '计时中...' : '开始'}
+            {isRunning ? "计时中..." : "开始"}
           </Button>
-          <Button 
-            size="large" 
+          <Button
             className="reset"
             onClick={handleReset}
             disabled={!isRunning && elapsedSeconds === 0}
+            icon={<ReloadOutlined />}
           >
             重置
           </Button>
         </div>
-        <Space wrap>
-          <Form>
-            <Form.Item
-              label="选择专注任务"
-              name="task"
-            >
-              <Select
-                placeholder="请选择专注任务"
-                style={{ width: 150 }}
-                onChange={handleChange}
-                options={[
-                  { value: 'jack', label: 'Jack' },
-                  { value: 'lucy', label: 'Lucy' },
-                  { value: 'Yiminghe', label: 'yiminghe' },
-                  { value: 'disabled', label: 'Disabled', disabled: true },
-                ]}
-              />
-            </Form.Item>
-          </Form>
-        </Space>
+
+        <div className="task-section">
+          <span className="task-label">选择专注任务</span>
+          <Select
+            placeholder="请选择或输入任务"
+            onChange={handleChange}
+            allowClear
+            showSearch
+            options={[
+              { value: "coding", label: "💻 编程开发" },
+              { value: "reading", label: "📚 阅读学习" },
+              { value: "writing", label: "✍️ 写作" },
+              { value: "design", label: "🎨 设计" },
+              { value: "study", label: "📖 复习" },
+              { value: "exercise", label: "🏃 运动" },
+            ]}
+          />
+        </div>
       </Card>
     </div>
-  )
+  );
 }
 
-export default Focus
+export default Focus;

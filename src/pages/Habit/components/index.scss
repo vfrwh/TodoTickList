@@ -1,0 +1,281 @@
+.habit-container {
+  height: 100%;
+  background: #f5f5f5;
+  padding: 24px;
+  overflow-y: auto; // 容器本身可以滚动
+
+  .habit-card {
+    width: 1200px;
+    margin: 0 auto;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid #f0f0f0 !important;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 48px); // 限制最大高度
+
+    .ant-card-head {
+      border-bottom: 1px solid #f0f0f0 !important;
+      padding: 0 24px !important;
+      background: linear-gradient(to bottom, #ffffff, #fafafa);
+      min-height: 60px;
+      flex-shrink: 0; // 防止头部压缩
+
+      .ant-card-head-title {
+        font-size: 18px;
+        font-weight: 500;
+        color: #262626;
+      }
+    }
+
+    .ant-card-body {
+      padding: 24px !important;
+      overflow-y: auto; // 卡片内容区域滚动
+      flex: 1;
+      min-height: 0; // 重要：让flex子项可以滚动
+
+      // 自定义滚动条
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 3px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #d9d9d9;
+        border-radius: 3px;
+
+        &:hover {
+          background: #bfbfbf;
+        }
+      }
+    }
+  }
+
+  .habit-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+    flex-shrink: 0; // 防止统计卡片压缩
+
+    .stat-item {
+      text-align: center;
+
+      .stat-value {
+        font-size: 32px;
+        font-weight: 600;
+        color: #1890ff;
+        line-height: 1.2;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #8c8c8c;
+        margin-top: 4px;
+      }
+    }
+  }
+
+  .habit-item-card {
+    border-radius: 10px !important;
+    transition: all 0.3s;
+    height: 100%;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    &.completed {
+      opacity: 0.8;
+      background: #fafafa;
+    }
+
+    .ant-card-body {
+      padding: 20px !important;
+    }
+  }
+
+  .habit-item {
+    .habit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+
+      .habit-title-wrapper {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .habit-point {
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+
+      .habit-info {
+        .habit-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #262626;
+          margin-bottom: 4px;
+        }
+
+        .habit-category {
+          border-radius: 12px;
+          font-size: 11px;
+          padding: 2px 8px;
+        }
+      }
+
+      .completed-tag {
+        border-radius: 12px;
+        font-size: 11px;
+      }
+    }
+
+    .habit-sign {
+      font-size: 14px;
+      color: #8c8c8c;
+      margin-bottom: 16px;
+      padding-left: 32px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; // 超出显示省略号
+    }
+
+    .habit-count {
+      font-size: 14px;
+      color: #8c8c8c;
+      margin-bottom: 8px;
+      padding-left: 32px;
+
+      .habit-count-value {
+        font-size: 24px;
+        font-weight: 600;
+        color: #262626;
+      }
+
+      .habit-count-total {
+        font-size: 14px;
+        color: #8c8c8c;
+      }
+    }
+
+    .habit-progress {
+      margin-bottom: 16px;
+      padding: 0 32px;
+    }
+
+    .habit-calculation {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 8px;
+
+      .calculation-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #8c8c8c;
+
+        .calculation-content {
+          color: #595959;
+        }
+
+        .calculation-value {
+          font-size: 18px;
+          font-weight: 600;
+          color: #262626;
+        }
+      }
+    }
+
+    .habit-actions {
+      display: flex;
+      gap: 12px;
+
+      .checkin-btn,
+      .edit-btn {
+        flex: 1;
+        height: 40px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .checkin-btn {
+        background: #1890ff;
+        color: white;
+        border: none;
+
+        &:hover:not(:disabled) {
+          background: #40a9ff;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+        }
+
+        &:disabled {
+          background: #d9d9d9;
+          color: #8c8c8c;
+        }
+      }
+
+      .edit-btn {
+        background: white;
+        border: 1px solid #d9d9d9;
+        color: #595959;
+
+        &:hover {
+          border-color: #1890ff;
+          color: #1890ff;
+          background: #f5f5f5;
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+}
+
+// 响应式
+@media (max-width: 1240px) {
+  .habit-container .habit-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .habit-container {
+    padding: 12px;
+
+    .habit-stats {
+      .stat-value {
+        font-size: 24px;
+      }
+    }
+
+    .habit-item {
+      .habit-sign {
+        white-space: normal; // 移动端允许换行
+      }
+    }
+
+    .habit-actions {
+      flex-direction: column;
+    }
+  }
+}
