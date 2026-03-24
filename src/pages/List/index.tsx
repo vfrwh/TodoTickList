@@ -19,10 +19,11 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { useTaskList } from "@/hooks/useTaskList";
 import { useTaskPriority } from "@/hooks/useTaskPriority";
+import { type ListItem } from "@/types/ListItem";
 
 // 创建优先级组件避免在回调中使用 Hook
-const PriorityTag = ({ priority }: { priority?: string }) => {
-  const { color, text } = useTaskPriority(priority as any);
+const PriorityTag = ({ priority }: { priority?: ListItem["priority"] }) => {
+  const { color, text } = useTaskPriority(priority);
   return <Tag color={color}>{text}</Tag>;
 };
 
@@ -84,7 +85,7 @@ function ListComponent() {
     };
 
   // 根据视图模式渲染不同的列表项
-  const renderListItem = (item: any) => {
+  const renderListItem = (item: ListItem) => {
     switch (currentViewMode) {
       case "card":
         return (

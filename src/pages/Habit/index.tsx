@@ -9,6 +9,7 @@ import {
 import "./index.scss";
 import type { ProgressProps } from "antd";
 import HabitDetails from "./components/HabitDetails";
+import type { HabitFormTypes } from "@/types/HabitFormType";
 import { useNavigate } from "react-router-dom";
 import {
   generateMockHabits,
@@ -93,7 +94,7 @@ function Habit() {
     }
   };
 
-  const handleSaveHabit = (habitData: any) => {
+  const handleSaveHabit = (habitData: HabitFormTypes) => {
     if (isEdit && currentHabit) {
       // 编辑现有习惯
       const updatedHabits = habits.map((h) =>
@@ -103,7 +104,7 @@ function Habit() {
               title: habitData.taskName,
               sign: habitData.sign,
               total: habitData.count,
-              category: habitData.category,
+              category: habitData.category as HabitItem["category"],
               color:
                 categoryColors[
                   habitData.category as keyof typeof categoryColors
@@ -125,7 +126,7 @@ function Habit() {
         color:
           categoryColors[habitData.category as keyof typeof categoryColors] ||
           "#1890ff",
-        category: habitData.category,
+        category: habitData.category as HabitItem["category"],
         completed: false,
       };
       setHabits([...habits, newHabit]);

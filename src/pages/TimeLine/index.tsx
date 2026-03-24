@@ -10,7 +10,12 @@ import {
   message,
 } from "antd";
 import type { BadgeProps, CalendarProps } from "antd";
-import { getListData, getMonthData, updateTaskDate } from "@/data/dateData";
+import {
+  getListData,
+  getMonthData,
+  updateTaskDate,
+  type CalendarTask,
+} from "@/data/dateData";
 import type { Dayjs } from "dayjs";
 import { CalendarOutlined, AppstoreOutlined } from "@ant-design/icons";
 import { useState, useEffect, useRef } from "react";
@@ -33,7 +38,7 @@ const DraggableTask = ({
   date,
   children,
 }: {
-  task: any;
+  task: CalendarTask;
   date: Dayjs;
   children: React.ReactNode;
 }) => {
@@ -116,11 +121,11 @@ const DroppableDateCell = ({
 function TimeLine() {
   const { settings, filterTasks, getTaskColor } = useTimelineSettings();
   const [viewType, setViewType] = useState<"month" | "year">("month"); // 固定为月视图
-  const [tasks, setTasks] = useState<any>({});
+  const [tasks, setTasks] = useState<Record<string, CalendarTask[]>>({});
 
   // 初始化任务数据
   useEffect(() => {
-    const initialTasks: any = {};
+    const initialTasks: Record<string, CalendarTask[]> = {};
     for (let i = -15; i <= 15; i++) {
       const date = dayjs().add(i, "day");
       const dateStr = date.format("YYYY-MM-DD");
@@ -152,12 +157,12 @@ function TimeLine() {
       return;
     }
 
-    setTasks((prevTasks: any) => {
+    setTasks((prevTasks: Record<string, CalendarTask[]>) => {
       const newTasks = { ...prevTasks };
 
       if (newTasks[sourceDateStr]) {
         newTasks[sourceDateStr] = newTasks[sourceDateStr].filter(
-          (t: any) => t.id !== task.id,
+          (t: CalendarTask) => t.id !== task.id,
         );
       }
 
@@ -168,7 +173,7 @@ function TimeLine() {
       const newTask = {
         ...task,
         id: task.id,
-      };
+      } as CalendarTask;
 
       newTasks[targetDateStr] = [...newTasks[targetDateStr], newTask];
       updateTaskDate(task.id, targetDateStr);
@@ -178,8 +183,8 @@ function TimeLine() {
     });
   };
 
-  const monthCellRender = (value: Dayjs) => {
-    const num = getMonthData(value);
+  const monthCellRender = () => {
+    const num = getMonthData();
     return num ? (
       <div className="month-cell">
         <div className="month-number">{num}</div>
@@ -220,9 +225,7 @@ function TimeLine() {
                     className="task-badge"
                   />
                   {settings.showTaskTags && item.tags && (
-                    <Tag size="small" className="task-tag">
-                      {item.tags[0]}
-                    </Tag>
+                    <Tag className="task-tag">{item.tags[0]}</Tag>
                   )}
                 </div>
               );
@@ -268,7 +271,7 @@ function TimeLine() {
 
   const cellRender: CalendarProps<Dayjs>["cellRender"] = (current, info) => {
     if (info.type === "date") return dateCellRender(current);
-    if (info.type === "month") return monthCellRender(current);
+    if (info.type === "month") return monthCellRender();
     return info.originNode;
   };
 
@@ -390,8 +393,8 @@ function TimeLine() {
     let warning = 0;
     let error = 0;
 
-    Object.values(tasks).forEach((dayTasks: any) => {
-      dayTasks.forEach((task: any) => {
+    Object.values(tasks).forEach((dayTasks: CalendarTask[]) => {
+      dayTasks.forEach((task: CalendarTask) => {
         total++;
         switch (task.type) {
           case "success":

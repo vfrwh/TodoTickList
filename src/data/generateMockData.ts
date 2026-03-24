@@ -37,11 +37,11 @@ const generateMockData = (count: number): ListItem[] => {
     "编写单元测试和集成测试",
   ];
   const avatars = [
-    "https://api.dicebear.com/7.x/miniavs/svg?seed=1",
-    "https://api.dicebear.com/7.x/miniavs/svg?seed=2",
-    "https://api.dicebear.com/7.x/miniavs/svg?seed=3",
-    "https://api.dicebear.com/7.x/miniavs/svg?seed=4",
-    "https://api.dicebear.com/7.x/miniavs/svg?seed=5",
+    "https://xsgames.co/randomusers/assets/avatars/pixel/1.jpg",
+    "https://xsgames.co/randomusers/assets/avatars/pixel/2.jpg",
+    "https://xsgames.co/randomusers/assets/avatars/pixel/3.jpg",
+    "https://xsgames.co/randomusers/assets/avatars/pixel/4.jpg",
+    "https://xsgames.co/randomusers/assets/avatars/pixel/5.jpg",
   ];
 
   return Array.from({ length: count }, (_, index) => ({

@@ -1,8 +1,10 @@
 import { useSelector } from "react-redux";
+import { useCallback } from "react";
 import type { RootState } from "@/store";
 import { defaultValues } from "@/data/timelineSettingsData";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
+import { type CalendarTask } from "@/data/dateData";
 
 // 扩展 dayjs 插件
 dayjs.extend(isoWeek);
@@ -14,13 +16,13 @@ export const useTimelineSettings = () => {
   });
 
   // 根据设置过滤任务
-  const filterTasks = (tasks: any[]) => {
+  const filterTasks = useCallback((tasks: CalendarTask[]) => {
     if (settings.maxTasksPerDay === 0) return tasks;
     return tasks.slice(0, settings.maxTasksPerDay);
-  };
+  }, [settings.maxTasksPerDay]);
 
   // 根据设置获取任务颜色
-  const getTaskColor = (task: any) => {
+  const getTaskColor = useCallback((task: CalendarTask) => {
     if (settings.taskColorScheme === "status") {
       switch (task.type) {
         case "success":
@@ -47,7 +49,7 @@ export const useTimelineSettings = () => {
           return "#1890ff";
       }
     }
-  };
+  }, [settings.taskColorScheme]);
 
   return {
     settings,

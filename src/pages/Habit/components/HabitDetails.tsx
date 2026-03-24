@@ -10,7 +10,6 @@ import {
 } from "antd";
 import { SaveOutlined, UndoOutlined, CloseOutlined } from "@ant-design/icons";
 import type { HabitDetailsProps, HabitFormTypes } from "@/types/HabitFormType";
-import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { categoryColors } from "@/data/habitData";
 import "./index.scss";
@@ -32,30 +31,28 @@ const HabitDetails = ({
   defaultTargetCount = 30,
 }: HabitDetailsExtendedProps) => {
   const [form] = Form.useForm();
-  const [searchParams] = useSearchParams();
-
-  // 通过url获取id
-  const editId = Number(searchParams.get("id"));
 
   // 编辑时填充表单
   useEffect(() => {
-    if (isEdit && habitData) {
-      form.setFieldsValue({
-        taskName: habitData.title,
-        sign: habitData.sign,
-        count: habitData.total,
-        category: habitData.category,
-      });
-    } else {
-      // 新增时使用默认值
-      form.setFieldsValue({
-        taskName: "",
-        sign: "",
-        count: defaultTargetCount,
-        category: defaultCategory,
-      });
+    if (open) {
+      if (isEdit && habitData) {
+        form.setFieldsValue({
+          taskName: habitData.title,
+          sign: habitData.sign,
+          count: habitData.total,
+          category: habitData.category,
+        });
+      } else {
+        // 新增时使用默认值
+        form.setFieldsValue({
+          taskName: "",
+          sign: "",
+          count: defaultTargetCount,
+          category: defaultCategory,
+        });
+      }
     }
-  }, [isEdit, habitData, form, defaultCategory, defaultTargetCount]);
+  }, [open, isEdit, habitData, form, defaultCategory, defaultTargetCount]);
 
   const onFinish = async (value: HabitFormTypes) => {
     try {

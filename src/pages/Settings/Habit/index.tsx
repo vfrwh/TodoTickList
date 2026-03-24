@@ -16,6 +16,7 @@ import {
   cardLayoutOptions,
   cardsPerRowOptions,
 } from "@/data/habitSettingsData";
+import { type HabitSettings } from "@/data/habitSettingsData";
 import { setDefaultValues } from "@/store/modules/habit";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
@@ -56,13 +57,13 @@ const HabitSettings = () => {
     form.setFieldsValue(initialValues);
   }, [habitSettingsValues, form]);
 
-  const handleSave1 = (values: any) => {
+  const handleSave1 = (values: HabitSettings) => {
     // 将 dayjs 对象转换回字符串
     const formattedValues = {
       ...values,
-      reminderTime: values.reminderTime
+      reminderTime: dayjs.isDayjs(values.reminderTime)
         ? values.reminderTime.format("HH:mm")
-        : undefined,
+        : values.reminderTime,
     };
     console.log("Saving habit settings:", formattedValues);
     dispatch(setDefaultValues(formattedValues));

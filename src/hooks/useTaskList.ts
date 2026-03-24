@@ -172,12 +172,13 @@ export const useTaskList = ({
       setPage(1);
       setHasMore(processed.length > PAGE_SIZE);
     }
-  }, [showCompleted, sortBy]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showCompleted, sortBy, processData]);
 
   // 初始化加载
   useEffect(() => {
     loadInitialData();
-  }, []);
+  }, [loadInitialData]);
 
   return {
     displayData,

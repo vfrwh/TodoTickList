@@ -93,7 +93,7 @@ export const getListData = (value: Dayjs): CalendarTask[] => {
 };
 
 // 获取某月的任务统计
-export const getMonthData = (value: Dayjs) => {
+export const getMonthData = () => {
   // 随机返回 1-5 的数字作为月任务数
   return Math.floor(Math.random() * 5) + 1;
 };

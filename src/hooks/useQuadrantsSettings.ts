@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { useCallback } from "react";
 import type { RootState } from "@/store";
 import { type TaskItem } from "@/types/taskItem";
 import { defaultValues } from "@/data/quadrantsSettingsData";
@@ -10,7 +11,7 @@ export const useQuadrantsSettings = () => {
   });
 
   // 根据设置处理任务列表
-  const processTasks = (tasks: TaskItem[]) => {
+  const processTasks = useCallback((tasks: TaskItem[]) => {
     if (!tasks) return [];
 
     const processed = [...tasks];
@@ -34,10 +35,10 @@ export const useQuadrantsSettings = () => {
     }
 
     return processed;
-  };
+  }, [settings.defaultSortBy]);
 
   // 根据设置获取卡片高度
-  const getCardHeight = () => {
+  const getCardHeight = useCallback(() => {
     switch (settings.cardSize) {
       case "small":
         return 240;
@@ -46,7 +47,7 @@ export const useQuadrantsSettings = () => {
       default:
         return 280;
     }
-  };
+  }, [settings.cardSize]);
 
   return {
     settings,

@@ -70,7 +70,7 @@ function Quadrants() {
       title4: processTasks(mockTasks.title4 || []),
     };
     setTasks(processedTasks);
-  }, []);
+  }, [processTasks]);
 
   // 当排序方式改变时重新处理任务
   useEffect(() => {
@@ -84,7 +84,8 @@ function Quadrants() {
       };
       setTasks(processedTasks);
     }
-  }, [settings.defaultSortBy]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.defaultSortBy, processTasks]);
 
   const quadrantsData = {
     title1: { number: number1, content: content1, tasks: tasks.title1 },
